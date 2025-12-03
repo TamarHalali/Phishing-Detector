@@ -14,6 +14,11 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   backend:
     build: ./backend
@@ -27,7 +32,8 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY:-demo_key}
       - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY:-demo_key}
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     restart: unless-stopped
 
   frontend:
@@ -36,7 +42,8 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_started
     restart: unless-stopped
 
 volumes:
