@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: phishing-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: phishing_db
+      MYSQL_USER: phishing_user
+      MYSQL_PASSWORD: phishing_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: phishing-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=mysql+pymysql://phishing_user:phishing_pass@mysql:3306/phishing_db
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-demo_key}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-demo_key}
+      - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY:-demo_key}
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: phishing-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+
+networks:
+  default:
+    name: phishing-network

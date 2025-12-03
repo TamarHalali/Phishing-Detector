@@ -1,0 +1,425 @@
+{
+  "lansweeper.com": {
+    "result": {
+      "risk_score": 0,
+      "is_malicious": false,
+      "detections": []
+    },
+    "timestamp": "2025-11-26T13:36:47.533033"
+  },
+  "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wavylr2fdnzbgpwkha27i0jtae1ioimv4auumpphho": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:36:47.534038"
+  },
+  "https://content.lansweeper.com/listunsubscribeheader/u/651653/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:36:47.535048"
+  },
+  "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:36:47.536054"
+  },
+  "https://content.lansweeper.com/emailpreference/epc/651653/mcapgngjjblftmhhojf0tp3tamew1kh2lsmxmnxtq0y/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:36:47.536054"
+  },
+  "https://content.lansweeper.com/l/651653/2025-11-10/2vhz29/651653/1762779645fdiygtqo/post_email_banner_non_reg.png": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:36:47.537048"
+  },
+  "https://content.lansweeper.com/l/651653/2019-04-04/51r91/651653/68616/lansweeper__grey_orange_.png": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:36:47.538048"
+  },
+  "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rl&d=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:36:47.540820"
+  },
+  "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?d=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:36:47.542137"
+  },
+  "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462)": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:36:47.544890"
+  },
+  "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wavylr2fdnzbgpwkha27i0jtae1ioimv4auumpphho)": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:36:47.546964"
+  },
+  "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rd&d=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:36:47.547979"
+  },
+  "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?f&d=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:36:47.548967"
+  },
+  "https://content.lansweeper.com/r/651653/1/1697505383/open/1": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:36:47.549962"
+  },
+  "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?p&d=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:36:47.550962"
+  },
+  "gmail.com": {
+    "result": {
+      "risk_score": 0,
+      "is_malicious": false,
+      "detections": []
+    },
+    "timestamp": "2025-11-26T13:36:56.299300"
+  },
+  "https://flagotechs.com/unsubscribe.php?id=3dpgizmzrm=": {
+    "result": {
+      "risk_score": 88,
+      "detections": [
+        [
+          "Norton",
+          "Spam"
+        ],
+        [
+          "ESET",
+          "Phishing"
+        ]
+      ],
+      "is_malicious": true
+    },
+    "timestamp": "2025-11-26T13:36:56.300340"
+  },
+  "https://flagotechs.com/unsubscribe.php?id=pgizmzrmzwizmgvlzmiwzjfmywezyze3zmmwngq1othiqgzsywdvdgvjahmuy29tpg%3d%3d": {
+    "result": {
+      "risk_score": 88,
+      "detections": [
+        [
+          "Norton",
+          "Spam"
+        ],
+        [
+          "ESET",
+          "Phishing"
+        ]
+      ],
+      "is_malicious": true
+    },
+    "timestamp": "2025-11-26T13:36:56.301341"
+  },
+  "https://bricklestrks.com/click?key=3dd09b99bba75b19938875&am=": {
+    "result": {
+      "risk_score": 95,
+      "detections": [
+        [
+          "Kaspersky",
+          "Phishing"
+        ],
+        [
+          "BitDefender",
+          "Malicious"
+        ],
+        [
+          "Avast",
+          "Fraud"
+        ]
+      ],
+      "is_malicious": true
+    },
+    "timestamp": "2025-11-26T13:36:56.301341"
+  },
+  "duolingo.com": {
+    "result": {
+      "risk_score": 0,
+      "is_malicious": false,
+      "detections": []
+    },
+    "timestamp": "2025-11-26T13:37:03.174071"
+  },
+  "https://www.duolingo.com/unsubscribe?type=notify_practice&email_type=practice_reminder&email=a92794911b2847278d9881c7c97b471c1ef7fb32inr5adq0ndiymkbnbwfpbc5jb20i&target=unsubscribe&utm_content=unsubscribe&utm_source=comeback&utm_medium=email&utm_campaign=practice_reminder": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:03.175074"
+  },
+  "tryhackme.com": {
+    "result": {
+      "risk_score": 0,
+      "is_malicious": false,
+      "detections": []
+    },
+    "timestamp": "2025-11-26T13:37:09.898179"
+  },
+  "https://tryhackme.com/manage-account/subscription?utm_source=cio&utm_medium=email&utm_campaign=blackfriday40renewannualactive": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.900176"
+  },
+  "https://e.customeriomail.com/e/c/eyjlbwfpbf9pzci6imrnvesxuvvmq=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.901177"
+  },
+  "https://whatis.customeriomail.com)": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.902178"
+  },
+  "https://tryhackme.com/manage-account/subscription?ut=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.903594"
+  },
+  "https://linkedin.com/company/tryhackme": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.905649"
+  },
+  "https://userimg-bee.customeriomail=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.909686"
+  },
+  "https://tryhackme.com/manage-account/subscription?utm_sour=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.913204"
+  },
+  "https://app-rsrc.getbee.io/public/resour=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.915946"
+  },
+  "https://e.customeriomail.com/e/o/eyjlbwfpbf9pzci6imrnvesxuvvmqu=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.917106"
+  },
+  "https://youtube.com/@realtryhackme": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.918683"
+  },
+  "https://e.customeriomail.com/e/c/eyjlbwfpb=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.920853"
+  },
+  "https://twitter.com/tryhackme": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.922618"
+  },
+  "https://tryhackme.com/terms": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.924200"
+  },
+  "https://app-rsrc.getbee.io/public/resources/=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.926325"
+  },
+  "https://userimg-assets.customeriom=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.929157"
+  },
+  "https://e.customeriomail.com/unsubscribe/dgtk1qulamaihgh=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.930337"
+  },
+  "https://app-rsrc.getbee.io/public/=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.931732"
+  },
+  "https://discord.gg/tryhackme": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.932739"
+  },
+  "https://e.customeriomail.com/unsubscribe/dgtk1qulamaihghfooybazq2044nrxpurdgmf8m8aw==": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.933740"
+  },
+  "https://tryhackme.com/manage-account/subscription?=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.934739"
+  },
+  "https://app-rsrc.getbee.io/public/resources/soci=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.936742"
+  },
+  "https://e.customeriomail.com/e/c/eyjlbwfpbf9pzci6imrnves=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.938790"
+  },
+  "https://instagram.com/realtryhackme": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.939791"
+  },
+  "https://fonts.googleapis.com/css2?family=3dubuntu:wght@400=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.943249"
+  },
+  "https://app-rsrc.getbee.io/public/resources/so=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.946968"
+  },
+  "https://track.customer.io/unsubscribe/dgtk1qulamaihghfooybazq=": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.948153"
+  },
+  "https://track.customer.io/unsubscribe/dgtk1qulamaihghfooybazq2044nrxpurdgmf8m8aw==": {
+    "result": {
+      "risk_score": 0,
+      "detections": [],
+      "is_malicious": false
+    },
+    "timestamp": "2025-11-26T13:37:09.949166"
+  }
+}

@@ -1,0 +1,1171 @@
+[
+  {
+    "id": 1,
+    "sender": "\"Lansweeper\" <update@lansweeper.com>",
+    "subject": "We Missed You at Lansweeper Connect. Don’t Miss What’s Next.",
+    "ai_score": 25,
+    "ai_summary": "Detected 1 phishing indicators",
+    "parsed_email": {
+      "sender": "\"Lansweeper\" <update@lansweeper.com>",
+      "subject": "We Missed You at Lansweeper Connect. Don’t Miss What’s Next.",
+      "body": "View Online (https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462)\r\n\r\nhttps://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho\r\nHi \\u05ea\\u05de\\u05e8,\r\n\r\nYou may have missed the live product release, but this one is worth catching up on.\r\n\r\nSee how Lansweeper is redefining visibility, control, and confidence across IT and security teams.\r\n\r\nWatch the highlights to learn how teams can:\r\n* Close every blind spot with the new Traffic Sensor.\r\n* Turn data into interactive insight with live BI-powered Dashboards (now GA).\r\n* Drive immediate action using Flow Builder for automation.\r\n* Work seamlessly in the new, modern, and AI-ready UI.\r\n\r\nThis release marks the next step for Lansweeper towards giving you unified visibility, continuous insights, and faster, more confident action across all teams and departments.\r\nWatch the Replay Now (https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho)\r\nThe Lansweeper Team\r\nLansweeper \\u2022 Fraterstraat 212 \\u2022 9820 Merelbeke \\u2022 Belgium\r\nUpdate email preferences https://content.lansweeper.com/emailPreference/epc/651653/MCApGNGjJBLFtMhhOJF0tp3TameW1Kh2lSMXmNxtq0Y/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383\r\n",
+      "urls": [
+        "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho",
+        "https://content.lansweeper.com/listUnsubscribeHeader/u/651653/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+        "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462",
+        "https://content.lansweeper.com/emailPreference/epc/651653/MCApGNGjJBLFtMhhOJF0tp3TameW1Kh2lSMXmNxtq0Y/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+        "https://content.lansweeper.com/l/651653/2025-11-10/2vhz29/651653/1762779645FDiYGTqO/Post_Email_Banner_Non_Reg.png",
+        "https://content.lansweeper.com/l/651653/2019-04-04/51r91/651653/68616/Lansweeper__Grey_Orange_.png",
+        "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rl&d=",
+        "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?d=",
+        "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462)",
+        "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho)",
+        "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rd&d=",
+        "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?f&d=",
+        "https://content.lansweeper.com/r/651653/1/1697505383/open/1",
+        "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?p&d="
+      ],
+      "attachments": []
+    },
+    "ai_analysis": {
+      "score": 25,
+      "summary": "Detected 1 phishing indicators",
+      "indicators": [
+        "Urgent language: 'immediate'"
+      ],
+      "detections": [],
+      "url_analysis": [
+        {
+          "original_url": "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho",
+          "expanded_url": "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/listUnsubscribeHeader/u/651653/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+          "expanded_url": "https://content.lansweeper.com/listUnsubscribeHeader/u/651653/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462",
+          "expanded_url": "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/emailPreference/epc/651653/MCApGNGjJBLFtMhhOJF0tp3TameW1Kh2lSMXmNxtq0Y/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+          "expanded_url": "https://content.lansweeper.com/emailPreference/epc/651653/MCApGNGjJBLFtMhhOJF0tp3TameW1Kh2lSMXmNxtq0Y/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/l/651653/2025-11-10/2vhz29/651653/1762779645FDiYGTqO/Post_Email_Banner_Non_Reg.png",
+          "expanded_url": "https://content.lansweeper.com/l/651653/2025-11-10/2vhz29/651653/1762779645FDiYGTqO/Post_Email_Banner_Non_Reg.png",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/l/651653/2019-04-04/51r91/651653/68616/Lansweeper__Grey_Orange_.png",
+          "expanded_url": "https://content.lansweeper.com/l/651653/2019-04-04/51r91/651653/68616/Lansweeper__Grey_Orange_.png",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rl&d=",
+          "expanded_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rl&d=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?d=",
+          "expanded_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?d=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462)",
+          "expanded_url": "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462)",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho)",
+          "expanded_url": "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho)",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rd&d=",
+          "expanded_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rd&d=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?f&d=",
+          "expanded_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?f&d=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/r/651653/1/1697505383/open/1",
+          "expanded_url": "https://content.lansweeper.com/r/651653/1/1697505383/open/1",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?p&d=",
+          "expanded_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?p&d=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        }
+      ]
+    },
+    "timestamp": "2025-11-26T13:36:47.551962"
+  },
+  {
+    "id": 2,
+    "sender": "תמר נסימי <tamar09891@gmail.com>",
+    "subject": "Fwd: ⏳ הזמן אוזל, ???! אל תאבד את המשלוח שלך!",
+    "ai_score": 100,
+    "ai_summary": "Detected 5 phishing indicators",
+    "parsed_email": {
+      "sender": "תמר נסימי <tamar09891@gmail.com>",
+      "subject": "Fwd: ⏳ הזמן אוזל, ???! אל תאבד את המשלוח שלך!",
+      "body": "---------- Forwarded message ---------\r\nמאת: צוות המעקב של FDelivery <notifications@avprotectionoffers.com>\r\n‪Date: יום ה׳, 20 בנוב׳ 2025 ב-14:38‬\r\n‪Subject: ⏳ הזמן אוזל, ???! אל תאבד את המשלוח שלך!‬\r\nTo: <tamar09891@gmail.com>\r\n\r\n\r\n???! כמעט הגעת\r\n\r\nרק צעד אחד אחרון נשאר כדי שתקבל את החבילה שלך.\r\n\r\nהיי ???,\r\n\r\nאנחנו לא מאחרים במסירת החבילה שלך, אבל עדיין חסר לנו דבר אחד קריטי – האישור\r\nהסופי שלך!\r\n\r\n⏰ *שים לב!* כדי להימנע מעיכובים או משלוח החבילה שלך חזרה, אנא אשר את פרטיך\r\nבתוך *24 השעות* הבאות.\r\n📋 מה קורה?\r\n\r\n1\r\n\r\nנשלח אימייל ראשון\r\n\r\nיצרנו קשר לפני 3 ימים.\r\n2\r\n\r\nמעקב נשלח\r\n\r\nנשלחה תזכורת לפני יומיים.\r\n3\r\n\r\nתזכורת אחרונה\r\n\r\nהמגע האחרון שלנו היה אתמול.\r\n!\r\n\r\nצעד אחרון - תורך לשחק!\r\n\r\nזהו זה! אשר עכשיו כדי לקבל את החבילה שלך.\r\n\r\nלוקח רק רגע להבטיח את המסירה שלך. פשוט הקש על הכפתור למטה:\r\n✅ כן, אשר את המסירה שלי!\r\n\r\nבברכה,\r\n*צוות FastDelivery* 🚚\r\n\r\n© 2023 FastDelivery. כל הזכויות שמורות.\r\n\r\nמבטיחים שהחבילות שלך יגיעו אליך, בבטחה ובזמן.\r\nUnsubscribe\r\n<https://flagotechs.com/unsubscribe.php?id=PGIzMzRmZWIzMGVlZmIwZjFmYWEzYzE3ZmMwNGQ1OThiQGZsYWdvdGVjaHMuY29tPg%3D%3D>\r\nFrom this mailing list.\r\n",
+      "urls": [
+        "https://flagotechs.com/unsubscribe.php?id=3DPGIzMzRm=",
+        "https://flagotechs.com/unsubscribe.php?id=PGIzMzRmZWIzMGVlZmIwZjFmYWEzYzE3ZmMwNGQ1OThiQGZsYWdvdGVjaHMuY29tPg%3D%3D",
+        "https://bricklestrks.com/click?key=3Dd09b99bba75b19938875&am="
+      ],
+      "attachments": []
+    },
+    "ai_analysis": {
+      "score": 100,
+      "summary": "Detected 5 phishing indicators",
+      "indicators": [
+        "Urgent language: 'אחרון'",
+        "Suspicious URL: https://flagotechs.com/unsubscribe.php?id=3DPGIzMzRm=",
+        "Suspicious URL: https://flagotechs.com/unsubscribe.php?id=PGIzMzRmZWIzMGVlZmIwZjFmYWEzYzE3ZmMwNGQ1OThiQGZsYWdvdGVjaHMuY29tPg%3D%3D",
+        "Suspicious URL: https://bricklestrks.com/click?key=3Dd09b99bba75b19938875&am=",
+        "Requests personal information: 'אישור'",
+        "Malicious URL detected: https://flagotechs.com/unsubscribe.php?id=3DPGIzMzRm=",
+        "Malicious URL detected: https://flagotechs.com/unsubscribe.php?id=PGIzMzRmZWIzMGVlZmIwZjFmYWEzYzE3ZmMwNGQ1OThiQGZsYWdvdGVjaHMuY29tPg%3D%3D",
+        "Malicious URL detected: https://bricklestrks.com/click?key=3Dd09b99bba75b19938875&am="
+      ],
+      "detections": [
+        [
+          "Norton",
+          "Spam"
+        ],
+        [
+          "ESET",
+          "Phishing"
+        ],
+        [
+          "Norton",
+          "Spam"
+        ],
+        [
+          "ESET",
+          "Phishing"
+        ],
+        [
+          "Kaspersky",
+          "Phishing"
+        ],
+        [
+          "BitDefender",
+          "Malicious"
+        ],
+        [
+          "Avast",
+          "Fraud"
+        ]
+      ],
+      "url_analysis": [
+        {
+          "original_url": "https://flagotechs.com/unsubscribe.php?id=3DPGIzMzRm=",
+          "expanded_url": "https://flagotechs.com/unsubscribe.php?id=3DPGIzMzRm=",
+          "is_shortened": false,
+          "risk_score": 88,
+          "detections": [
+            [
+              "Norton",
+              "Spam"
+            ],
+            [
+              "ESET",
+              "Phishing"
+            ]
+          ],
+          "is_malicious": true
+        },
+        {
+          "original_url": "https://flagotechs.com/unsubscribe.php?id=PGIzMzRmZWIzMGVlZmIwZjFmYWEzYzE3ZmMwNGQ1OThiQGZsYWdvdGVjaHMuY29tPg%3D%3D",
+          "expanded_url": "https://flagotechs.com/unsubscribe.php?id=PGIzMzRmZWIzMGVlZmIwZjFmYWEzYzE3ZmMwNGQ1OThiQGZsYWdvdGVjaHMuY29tPg%3D%3D",
+          "is_shortened": false,
+          "risk_score": 88,
+          "detections": [
+            [
+              "Norton",
+              "Spam"
+            ],
+            [
+              "ESET",
+              "Phishing"
+            ]
+          ],
+          "is_malicious": true
+        },
+        {
+          "original_url": "https://bricklestrks.com/click?key=3Dd09b99bba75b19938875&am=",
+          "expanded_url": "https://bricklestrks.com/click?key=3Dd09b99bba75b19938875&am=",
+          "is_shortened": false,
+          "risk_score": 95,
+          "detections": [
+            [
+              "Kaspersky",
+              "Phishing"
+            ],
+            [
+              "BitDefender",
+              "Malicious"
+            ],
+            [
+              "Avast",
+              "Fraud"
+            ]
+          ],
+          "is_malicious": true
+        }
+      ]
+    },
+    "timestamp": "2025-11-26T13:36:56.305909"
+  },
+  {
+    "id": 3,
+    "sender": "Duolingo <hello@duolingo.com>",
+    "subject": "Mohammed is waiting. Protect your Friend Streak!",
+    "ai_score": 0,
+    "ai_summary": "No significant phishing indicators detected",
+    "parsed_email": {
+      "sender": "Duolingo <hello@duolingo.com>",
+      "subject": "Mohammed is waiting. Protect your Friend Streak!",
+      "body": "I0\u0011L\u0002I#i\u0007nX((\u001e8zwj)mʗ",
+      "urls": [
+        "https://www.duolingo.com/unsubscribe?type=notify_practice&email_type=practice_reminder&email=a92794911b2847278d9881c7c97b471c1ef7fb32InR5aDQ0NDIyMkBnbWFpbC5jb20i&target=unsubscribe&utm_content=unsubscribe&utm_source=comeback&utm_medium=email&utm_campaign=practice_reminder"
+      ],
+      "attachments": []
+    },
+    "ai_analysis": {
+      "score": 0,
+      "summary": "No significant phishing indicators detected",
+      "indicators": [],
+      "detections": [],
+      "url_analysis": [
+        {
+          "original_url": "https://www.duolingo.com/unsubscribe?type=notify_practice&email_type=practice_reminder&email=a92794911b2847278d9881c7c97b471c1ef7fb32InR5aDQ0NDIyMkBnbWFpbC5jb20i&target=unsubscribe&utm_content=unsubscribe&utm_source=comeback&utm_medium=email&utm_campaign=practice_reminder",
+          "expanded_url": "https://www.duolingo.com/unsubscribe?type=notify_practice&email_type=practice_reminder&email=a92794911b2847278d9881c7c97b471c1ef7fb32InR5aDQ0NDIyMkBnbWFpbC5jb20i&target=unsubscribe&utm_content=unsubscribe&utm_source=comeback&utm_medium=email&utm_campaign=practice_reminder",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        }
+      ]
+    },
+    "timestamp": "2025-11-26T13:37:03.176075"
+  },
+  {
+    "id": 4,
+    "sender": "TryHackMe <donotreply@tryhackme.com>",
+    "subject": "Renew Early & Save 40%: Black Friday Starts Today 🚀",
+    "ai_score": 25,
+    "ai_summary": "Detected 1 phishing indicators",
+    "parsed_email": {
+      "sender": "TryHackMe <donotreply@tryhackme.com>",
+      "subject": "Renew Early & Save 40%: Black Friday Starts Today 🚀",
+      "body": "TryHackMe Logo ( https://tryhackme.com/manage-account/subscription?utm_source=cio&utm_medium=email&utm_campaign=blackfriday40RenewAnnualActive )\r\n\r\n40% Off Black Friday ( https://tryhackme.com/manage-account/subscription?utm_source=cio&utm_medium=email&utm_campaign=blackfriday40RenewAnnualActive )\r\n\r\nOffer Ends 28 Nov\r\n\r\nHey t.y.h,\r\n\r\nBlack Friday is here and for a limited time,\r\nyou can renew your next annual cycle at 40% off.\r\n\r\nThis is our biggest offer of the year, available only until 28th November.\r\n\r\nRenew Early at 40% Off ( https://tryhackme.com/manage-account/subscription?utm_source=cio&utm_medium=email&utm_campaign=blackfriday40RenewAnnualActive )\r\n\r\nHere’s how your early renewal works:\r\n\r\n* Your payment today covers your next annual subscription cycle.\r\n* Your current subscription remains active until its usual renewal date.\r\n* When that date arrives, you’ll receive an invoice showing a 100% discount, since you’ve already paid in advance.\r\n* No changes to your plan, no interruptions, no surprises, just guaranteed savings for the year ahead.\r\n\r\nThis Black Friday offer is available for a short time only. Secure your renewal before the deal ends.\r\n\r\nDiscord ( https://discord.gg/tryhackme )\r\nX ( https://twitter.com/tryhackme )\r\nInstagram ( https://instagram.com/realtryhackme )\r\nLinkedIn ( https://linkedin.com/company/tryhackme )\r\nYouTube ( https://youtube.com/@realtryhackme )\r\n\r\nTerms ( https://tryhackme.com/terms ) |\r\nUnsubscribe ( https://track.customer.io/unsubscribe/dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw== )\r\n\r\n© 2025 TryHackMe. All rights reserved.\r\n\r\n*Renewal discount valid only for existing Annual Premium members.\r\n\r\nApplies exclusively to early renewal purchases of the annual plan and cannot be combined with other discounts, including student offers.\r\n\r\nRenewal discount is applied to the next billing cycle only.",
+      "urls": [
+        "https://tryhackme.com/manage-account/subscription?utm_source=cio&utm_medium=email&utm_campaign=blackfriday40RenewAnnualActive",
+        "https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEsxUVVMQ=",
+        "https://whatis.customeriomail.com)",
+        "https://tryhackme.com/manage-account/subscription?ut=",
+        "https://linkedin.com/company/tryhackme",
+        "https://userimg-bee.customeriomail=",
+        "https://tryhackme.com/manage-account/subscription?utm_sour=",
+        "https://app-rsrc.getbee.io/public/resour=",
+        "https://e.customeriomail.com/e/o/eyJlbWFpbF9pZCI6ImRnVEsxUVVMQU=",
+        "https://youtube.com/@realtryhackme",
+        "https://e.customeriomail.com/e/c/eyJlbWFpb=",
+        "https://twitter.com/tryhackme",
+        "https://tryhackme.com/terms",
+        "https://app-rsrc.getbee.io/public/resources/=",
+        "https://userimg-assets.customeriom=",
+        "https://e.customeriomail.com/unsubscribe/dgTK1QULAMaihgH=",
+        "https://app-rsrc.getbee.io/public/=",
+        "https://discord.gg/tryhackme",
+        "https://e.customeriomail.com/unsubscribe/dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw==",
+        "https://tryhackme.com/manage-account/subscription?=",
+        "https://app-rsrc.getbee.io/public/resources/soci=",
+        "https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEs=",
+        "https://instagram.com/realtryhackme",
+        "https://fonts.googleapis.com/css2?family=3DUbuntu:wght@400=",
+        "https://app-rsrc.getbee.io/public/resources/so=",
+        "https://track.customer.io/unsubscribe/dgTK1QULAMaihgHFooYBAZq=",
+        "https://track.customer.io/unsubscribe/dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw=="
+      ],
+      "attachments": []
+    },
+    "ai_analysis": {
+      "score": 25,
+      "summary": "Detected 1 phishing indicators",
+      "indicators": [
+        "Urgent language: 'limited time'"
+      ],
+      "detections": [],
+      "url_analysis": [
+        {
+          "original_url": "https://tryhackme.com/manage-account/subscription?utm_source=cio&utm_medium=email&utm_campaign=blackfriday40RenewAnnualActive",
+          "expanded_url": "https://tryhackme.com/manage-account/subscription?utm_source=cio&utm_medium=email&utm_campaign=blackfriday40RenewAnnualActive",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEsxUVVMQ=",
+          "expanded_url": "https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEsxUVVMQ=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://whatis.customeriomail.com)",
+          "expanded_url": "https://whatis.customeriomail.com)",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://tryhackme.com/manage-account/subscription?ut=",
+          "expanded_url": "https://tryhackme.com/manage-account/subscription?ut=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://linkedin.com/company/tryhackme",
+          "expanded_url": "https://linkedin.com/company/tryhackme",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://userimg-bee.customeriomail=",
+          "expanded_url": "https://userimg-bee.customeriomail=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://tryhackme.com/manage-account/subscription?utm_sour=",
+          "expanded_url": "https://tryhackme.com/manage-account/subscription?utm_sour=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://app-rsrc.getbee.io/public/resour=",
+          "expanded_url": "https://app-rsrc.getbee.io/public/resour=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://e.customeriomail.com/e/o/eyJlbWFpbF9pZCI6ImRnVEsxUVVMQU=",
+          "expanded_url": "https://e.customeriomail.com/e/o/eyJlbWFpbF9pZCI6ImRnVEsxUVVMQU=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://youtube.com/@realtryhackme",
+          "expanded_url": "https://youtube.com/@realtryhackme",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://e.customeriomail.com/e/c/eyJlbWFpb=",
+          "expanded_url": "https://e.customeriomail.com/e/c/eyJlbWFpb=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://twitter.com/tryhackme",
+          "expanded_url": "https://twitter.com/tryhackme",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://tryhackme.com/terms",
+          "expanded_url": "https://tryhackme.com/terms",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://app-rsrc.getbee.io/public/resources/=",
+          "expanded_url": "https://app-rsrc.getbee.io/public/resources/=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://userimg-assets.customeriom=",
+          "expanded_url": "https://userimg-assets.customeriom=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://e.customeriomail.com/unsubscribe/dgTK1QULAMaihgH=",
+          "expanded_url": "https://e.customeriomail.com/unsubscribe/dgTK1QULAMaihgH=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://app-rsrc.getbee.io/public/=",
+          "expanded_url": "https://app-rsrc.getbee.io/public/=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://discord.gg/tryhackme",
+          "expanded_url": "https://discord.gg/tryhackme",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://e.customeriomail.com/unsubscribe/dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw==",
+          "expanded_url": "https://e.customeriomail.com/unsubscribe/dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw==",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://tryhackme.com/manage-account/subscription?=",
+          "expanded_url": "https://tryhackme.com/manage-account/subscription?=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://app-rsrc.getbee.io/public/resources/soci=",
+          "expanded_url": "https://app-rsrc.getbee.io/public/resources/soci=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEs=",
+          "expanded_url": "https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEs=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://instagram.com/realtryhackme",
+          "expanded_url": "https://instagram.com/realtryhackme",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://fonts.googleapis.com/css2?family=3DUbuntu:wght@400=",
+          "expanded_url": "https://fonts.googleapis.com/css2?family=3DUbuntu:wght@400=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://app-rsrc.getbee.io/public/resources/so=",
+          "expanded_url": "https://app-rsrc.getbee.io/public/resources/so=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://track.customer.io/unsubscribe/dgTK1QULAMaihgHFooYBAZq=",
+          "expanded_url": "https://track.customer.io/unsubscribe/dgTK1QULAMaihgHFooYBAZq=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://track.customer.io/unsubscribe/dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw==",
+          "expanded_url": "https://track.customer.io/unsubscribe/dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw==",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        }
+      ]
+    },
+    "timestamp": "2025-11-26T13:37:09.951181"
+  },
+  {
+    "id": 5,
+    "sender": "TryHackMe <donotreply@tryhackme.com>",
+    "subject": "Renew Early & Save 40%: Black Friday Starts Today 🚀",
+    "ai_score": 25,
+    "ai_summary": "Detected 1 phishing indicators",
+    "parsed_email": {
+      "sender": "TryHackMe <donotreply@tryhackme.com>",
+      "subject": "Renew Early & Save 40%: Black Friday Starts Today 🚀",
+      "body": "TryHackMe Logo ( https://tryhackme.com/manage-account/subscription?utm_source=cio&utm_medium=email&utm_campaign=blackfriday40RenewAnnualActive )\r\n\r\n40% Off Black Friday ( https://tryhackme.com/manage-account/subscription?utm_source=cio&utm_medium=email&utm_campaign=blackfriday40RenewAnnualActive )\r\n\r\nOffer Ends 28 Nov\r\n\r\nHey t.y.h,\r\n\r\nBlack Friday is here and for a limited time,\r\nyou can renew your next annual cycle at 40% off.\r\n\r\nThis is our biggest offer of the year, available only until 28th November.\r\n\r\nRenew Early at 40% Off ( https://tryhackme.com/manage-account/subscription?utm_source=cio&utm_medium=email&utm_campaign=blackfriday40RenewAnnualActive )\r\n\r\nHere’s how your early renewal works:\r\n\r\n* Your payment today covers your next annual subscription cycle.\r\n* Your current subscription remains active until its usual renewal date.\r\n* When that date arrives, you’ll receive an invoice showing a 100% discount, since you’ve already paid in advance.\r\n* No changes to your plan, no interruptions, no surprises, just guaranteed savings for the year ahead.\r\n\r\nThis Black Friday offer is available for a short time only. Secure your renewal before the deal ends.\r\n\r\nDiscord ( https://discord.gg/tryhackme )\r\nX ( https://twitter.com/tryhackme )\r\nInstagram ( https://instagram.com/realtryhackme )\r\nLinkedIn ( https://linkedin.com/company/tryhackme )\r\nYouTube ( https://youtube.com/@realtryhackme )\r\n\r\nTerms ( https://tryhackme.com/terms ) |\r\nUnsubscribe ( https://track.customer.io/unsubscribe/dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw== )\r\n\r\n© 2025 TryHackMe. All rights reserved.\r\n\r\n*Renewal discount valid only for existing Annual Premium members.\r\n\r\nApplies exclusively to early renewal purchases of the annual plan and cannot be combined with other discounts, including student offers.\r\n\r\nRenewal discount is applied to the next billing cycle only.",
+      "urls": [
+        "https://tryhackme.com/manage-account/subscription?utm_source=cio&utm_medium=email&utm_campaign=blackfriday40RenewAnnualActive",
+        "https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEsxUVVMQ=",
+        "https://whatis.customeriomail.com)",
+        "https://tryhackme.com/manage-account/subscription?ut=",
+        "https://linkedin.com/company/tryhackme",
+        "https://userimg-bee.customeriomail=",
+        "https://tryhackme.com/manage-account/subscription?utm_sour=",
+        "https://app-rsrc.getbee.io/public/resour=",
+        "https://e.customeriomail.com/e/o/eyJlbWFpbF9pZCI6ImRnVEsxUVVMQU=",
+        "https://youtube.com/@realtryhackme",
+        "https://e.customeriomail.com/e/c/eyJlbWFpb=",
+        "https://twitter.com/tryhackme",
+        "https://tryhackme.com/terms",
+        "https://app-rsrc.getbee.io/public/resources/=",
+        "https://userimg-assets.customeriom=",
+        "https://e.customeriomail.com/unsubscribe/dgTK1QULAMaihgH=",
+        "https://app-rsrc.getbee.io/public/=",
+        "https://discord.gg/tryhackme",
+        "https://e.customeriomail.com/unsubscribe/dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw==",
+        "https://tryhackme.com/manage-account/subscription?=",
+        "https://app-rsrc.getbee.io/public/resources/soci=",
+        "https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEs=",
+        "https://instagram.com/realtryhackme",
+        "https://fonts.googleapis.com/css2?family=3DUbuntu:wght@400=",
+        "https://app-rsrc.getbee.io/public/resources/so=",
+        "https://track.customer.io/unsubscribe/dgTK1QULAMaihgHFooYBAZq=",
+        "https://track.customer.io/unsubscribe/dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw=="
+      ],
+      "attachments": []
+    },
+    "ai_analysis": {
+      "score": 25,
+      "summary": "Detected 1 phishing indicators",
+      "indicators": [
+        "Urgent language: 'limited time'"
+      ],
+      "detections": [],
+      "url_analysis": [
+        {
+          "original_url": "https://tryhackme.com/manage-account/subscription?utm_source=cio&utm_medium=email&utm_campaign=blackfriday40RenewAnnualActive",
+          "expanded_url": "https://tryhackme.com/manage-account/subscription?utm_source=cio&utm_medium=email&utm_campaign=blackfriday40RenewAnnualActive",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEsxUVVMQ=",
+          "expanded_url": "https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEsxUVVMQ=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://whatis.customeriomail.com)",
+          "expanded_url": "https://whatis.customeriomail.com)",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://tryhackme.com/manage-account/subscription?ut=",
+          "expanded_url": "https://tryhackme.com/manage-account/subscription?ut=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://linkedin.com/company/tryhackme",
+          "expanded_url": "https://linkedin.com/company/tryhackme",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://userimg-bee.customeriomail=",
+          "expanded_url": "https://userimg-bee.customeriomail=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://tryhackme.com/manage-account/subscription?utm_sour=",
+          "expanded_url": "https://tryhackme.com/manage-account/subscription?utm_sour=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://app-rsrc.getbee.io/public/resour=",
+          "expanded_url": "https://app-rsrc.getbee.io/public/resour=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://e.customeriomail.com/e/o/eyJlbWFpbF9pZCI6ImRnVEsxUVVMQU=",
+          "expanded_url": "https://e.customeriomail.com/e/o/eyJlbWFpbF9pZCI6ImRnVEsxUVVMQU=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://youtube.com/@realtryhackme",
+          "expanded_url": "https://youtube.com/@realtryhackme",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://e.customeriomail.com/e/c/eyJlbWFpb=",
+          "expanded_url": "https://e.customeriomail.com/e/c/eyJlbWFpb=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://twitter.com/tryhackme",
+          "expanded_url": "https://twitter.com/tryhackme",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://tryhackme.com/terms",
+          "expanded_url": "https://tryhackme.com/terms",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://app-rsrc.getbee.io/public/resources/=",
+          "expanded_url": "https://app-rsrc.getbee.io/public/resources/=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://userimg-assets.customeriom=",
+          "expanded_url": "https://userimg-assets.customeriom=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://e.customeriomail.com/unsubscribe/dgTK1QULAMaihgH=",
+          "expanded_url": "https://e.customeriomail.com/unsubscribe/dgTK1QULAMaihgH=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://app-rsrc.getbee.io/public/=",
+          "expanded_url": "https://app-rsrc.getbee.io/public/=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://discord.gg/tryhackme",
+          "expanded_url": "https://discord.gg/tryhackme",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://e.customeriomail.com/unsubscribe/dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw==",
+          "expanded_url": "https://e.customeriomail.com/unsubscribe/dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw==",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://tryhackme.com/manage-account/subscription?=",
+          "expanded_url": "https://tryhackme.com/manage-account/subscription?=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://app-rsrc.getbee.io/public/resources/soci=",
+          "expanded_url": "https://app-rsrc.getbee.io/public/resources/soci=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEs=",
+          "expanded_url": "https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEs=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://instagram.com/realtryhackme",
+          "expanded_url": "https://instagram.com/realtryhackme",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://fonts.googleapis.com/css2?family=3DUbuntu:wght@400=",
+          "expanded_url": "https://fonts.googleapis.com/css2?family=3DUbuntu:wght@400=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://app-rsrc.getbee.io/public/resources/so=",
+          "expanded_url": "https://app-rsrc.getbee.io/public/resources/so=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://track.customer.io/unsubscribe/dgTK1QULAMaihgHFooYBAZq=",
+          "expanded_url": "https://track.customer.io/unsubscribe/dgTK1QULAMaihgHFooYBAZq=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://track.customer.io/unsubscribe/dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw==",
+          "expanded_url": "https://track.customer.io/unsubscribe/dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw==",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        }
+      ]
+    },
+    "timestamp": "2025-11-26T13:37:20.729615"
+  },
+  {
+    "id": 6,
+    "sender": "Haim Abeles <haimabeles@gmail.com>",
+    "subject": "המשך קורס AI - מחר",
+    "ai_score": 0,
+    "ai_summary": "No significant phishing indicators detected",
+    "parsed_email": {
+      "sender": "Haim Abeles <haimabeles@gmail.com>",
+      "subject": "המשך קורס AI - מחר",
+      "body": "M4",
+      "urls": [],
+      "attachments": []
+    },
+    "ai_analysis": {
+      "score": 0,
+      "summary": "No significant phishing indicators detected",
+      "indicators": [],
+      "detections": [],
+      "url_analysis": []
+    },
+    "timestamp": "2025-11-26T13:37:30.395143"
+  },
+  {
+    "id": 7,
+    "sender": "\"Lansweeper\" <update@lansweeper.com>",
+    "subject": "We Missed You at Lansweeper Connect. Don’t Miss What’s Next.",
+    "ai_score": 25,
+    "ai_summary": "Detected 1 phishing indicators",
+    "parsed_email": {
+      "sender": "\"Lansweeper\" <update@lansweeper.com>",
+      "subject": "We Missed You at Lansweeper Connect. Don’t Miss What’s Next.",
+      "body": "View Online (https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462)\r\n\r\nhttps://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho\r\nHi \\u05ea\\u05de\\u05e8,\r\n\r\nYou may have missed the live product release, but this one is worth catching up on.\r\n\r\nSee how Lansweeper is redefining visibility, control, and confidence across IT and security teams.\r\n\r\nWatch the highlights to learn how teams can:\r\n* Close every blind spot with the new Traffic Sensor.\r\n* Turn data into interactive insight with live BI-powered Dashboards (now GA).\r\n* Drive immediate action using Flow Builder for automation.\r\n* Work seamlessly in the new, modern, and AI-ready UI.\r\n\r\nThis release marks the next step for Lansweeper towards giving you unified visibility, continuous insights, and faster, more confident action across all teams and departments.\r\nWatch the Replay Now (https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho)\r\nThe Lansweeper Team\r\nLansweeper \\u2022 Fraterstraat 212 \\u2022 9820 Merelbeke \\u2022 Belgium\r\nUpdate email preferences https://content.lansweeper.com/emailPreference/epc/651653/MCApGNGjJBLFtMhhOJF0tp3TameW1Kh2lSMXmNxtq0Y/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383\r\n",
+      "urls": [
+        "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho",
+        "https://content.lansweeper.com/listUnsubscribeHeader/u/651653/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+        "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462",
+        "https://content.lansweeper.com/emailPreference/epc/651653/MCApGNGjJBLFtMhhOJF0tp3TameW1Kh2lSMXmNxtq0Y/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+        "https://content.lansweeper.com/l/651653/2025-11-10/2vhz29/651653/1762779645FDiYGTqO/Post_Email_Banner_Non_Reg.png",
+        "https://content.lansweeper.com/l/651653/2019-04-04/51r91/651653/68616/Lansweeper__Grey_Orange_.png",
+        "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rl&d=",
+        "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?d=",
+        "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462)",
+        "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho)",
+        "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rd&d=",
+        "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?f&d=",
+        "https://content.lansweeper.com/r/651653/1/1697505383/open/1",
+        "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?p&d="
+      ],
+      "attachments": []
+    },
+    "ai_analysis": {
+      "score": 25,
+      "summary": "Detected 1 phishing indicators",
+      "indicators": [
+        "Urgent language: 'immediate'"
+      ],
+      "detections": [],
+      "url_analysis": [
+        {
+          "original_url": "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho",
+          "expanded_url": "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/listUnsubscribeHeader/u/651653/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+          "expanded_url": "https://content.lansweeper.com/listUnsubscribeHeader/u/651653/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462",
+          "expanded_url": "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/emailPreference/epc/651653/MCApGNGjJBLFtMhhOJF0tp3TameW1Kh2lSMXmNxtq0Y/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+          "expanded_url": "https://content.lansweeper.com/emailPreference/epc/651653/MCApGNGjJBLFtMhhOJF0tp3TameW1Kh2lSMXmNxtq0Y/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/l/651653/2025-11-10/2vhz29/651653/1762779645FDiYGTqO/Post_Email_Banner_Non_Reg.png",
+          "expanded_url": "https://content.lansweeper.com/l/651653/2025-11-10/2vhz29/651653/1762779645FDiYGTqO/Post_Email_Banner_Non_Reg.png",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/l/651653/2019-04-04/51r91/651653/68616/Lansweeper__Grey_Orange_.png",
+          "expanded_url": "https://content.lansweeper.com/l/651653/2019-04-04/51r91/651653/68616/Lansweeper__Grey_Orange_.png",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rl&d=",
+          "expanded_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rl&d=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?d=",
+          "expanded_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?d=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462)",
+          "expanded_url": "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462)",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho)",
+          "expanded_url": "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho)",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rd&d=",
+          "expanded_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rd&d=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?f&d=",
+          "expanded_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?f&d=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/r/651653/1/1697505383/open/1",
+          "expanded_url": "https://content.lansweeper.com/r/651653/1/1697505383/open/1",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?p&d=",
+          "expanded_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?p&d=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        }
+      ]
+    },
+    "timestamp": "2025-11-26T13:39:40.637481"
+  },
+  {
+    "id": 8,
+    "sender": "\"Lansweeper\" <update@lansweeper.com>",
+    "subject": "We Missed You at Lansweeper Connect. Don’t Miss What’s Next.",
+    "ai_score": 25,
+    "ai_summary": "Detected 1 phishing indicators",
+    "parsed_email": {
+      "sender": "\"Lansweeper\" <update@lansweeper.com>",
+      "subject": "We Missed You at Lansweeper Connect. Don’t Miss What’s Next.",
+      "body": "View Online (https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462)\r\n\r\nhttps://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho\r\nHi \\u05ea\\u05de\\u05e8,\r\n\r\nYou may have missed the live product release, but this one is worth catching up on.\r\n\r\nSee how Lansweeper is redefining visibility, control, and confidence across IT and security teams.\r\n\r\nWatch the highlights to learn how teams can:\r\n* Close every blind spot with the new Traffic Sensor.\r\n* Turn data into interactive insight with live BI-powered Dashboards (now GA).\r\n* Drive immediate action using Flow Builder for automation.\r\n* Work seamlessly in the new, modern, and AI-ready UI.\r\n\r\nThis release marks the next step for Lansweeper towards giving you unified visibility, continuous insights, and faster, more confident action across all teams and departments.\r\nWatch the Replay Now (https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho)\r\nThe Lansweeper Team\r\nLansweeper \\u2022 Fraterstraat 212 \\u2022 9820 Merelbeke \\u2022 Belgium\r\nUpdate email preferences https://content.lansweeper.com/emailPreference/epc/651653/MCApGNGjJBLFtMhhOJF0tp3TameW1Kh2lSMXmNxtq0Y/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383\r\n",
+      "urls": [
+        "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho",
+        "https://content.lansweeper.com/listUnsubscribeHeader/u/651653/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+        "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462",
+        "https://content.lansweeper.com/emailPreference/epc/651653/MCApGNGjJBLFtMhhOJF0tp3TameW1Kh2lSMXmNxtq0Y/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+        "https://content.lansweeper.com/l/651653/2025-11-10/2vhz29/651653/1762779645FDiYGTqO/Post_Email_Banner_Non_Reg.png",
+        "https://content.lansweeper.com/l/651653/2019-04-04/51r91/651653/68616/Lansweeper__Grey_Orange_.png",
+        "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rl&d=",
+        "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?d=",
+        "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462)",
+        "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho)",
+        "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rd&d=",
+        "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?f&d=",
+        "https://content.lansweeper.com/r/651653/1/1697505383/open/1",
+        "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?p&d="
+      ],
+      "attachments": []
+    },
+    "ai_analysis": {
+      "score": 25,
+      "summary": "Detected 1 phishing indicators",
+      "indicators": [
+        "Urgent language: 'immediate'"
+      ],
+      "detections": [],
+      "url_analysis": [
+        {
+          "original_url": "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho",
+          "expanded_url": "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/listUnsubscribeHeader/u/651653/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+          "expanded_url": "https://content.lansweeper.com/listUnsubscribeHeader/u/651653/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462",
+          "expanded_url": "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/emailPreference/epc/651653/MCApGNGjJBLFtMhhOJF0tp3TameW1Kh2lSMXmNxtq0Y/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+          "expanded_url": "https://content.lansweeper.com/emailPreference/epc/651653/MCApGNGjJBLFtMhhOJF0tp3TameW1Kh2lSMXmNxtq0Y/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462/1697505383",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/l/651653/2025-11-10/2vhz29/651653/1762779645FDiYGTqO/Post_Email_Banner_Non_Reg.png",
+          "expanded_url": "https://content.lansweeper.com/l/651653/2025-11-10/2vhz29/651653/1762779645FDiYGTqO/Post_Email_Banner_Non_Reg.png",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/l/651653/2019-04-04/51r91/651653/68616/Lansweeper__Grey_Orange_.png",
+          "expanded_url": "https://content.lansweeper.com/l/651653/2019-04-04/51r91/651653/68616/Lansweeper__Grey_Orange_.png",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rl&d=",
+          "expanded_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rl&d=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?d=",
+          "expanded_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?d=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462)",
+          "expanded_url": "https://content.lansweeper.com/webmail/651653/1697505383/e63b199284d98e25605c55014bf8b7c581538cd33402efe70aed3bbbe2790462)",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho)",
+          "expanded_url": "https://content.lansweeper.com/e/651653/utm-content-database-prospects/2vhzc3/1697505383/h/1wAVyLR2fDNZbGpWKHa27i0jtAe1Ioimv4auuMPPHho)",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rd&d=",
+          "expanded_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?rd&d=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?f&d=",
+          "expanded_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?f&d=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://content.lansweeper.com/r/651653/1/1697505383/open/1",
+          "expanded_url": "https://content.lansweeper.com/r/651653/1/1697505383/open/1",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        },
+        {
+          "original_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?p&d=",
+          "expanded_url": "https://ur8e2e2z.emltrk.com/v2/ur8e2e2z?p&d=",
+          "is_shortened": false,
+          "risk_score": 0,
+          "detections": [],
+          "is_malicious": false
+        }
+      ]
+    },
+    "timestamp": "2025-11-26T13:44:09.993287"
+  }
+]

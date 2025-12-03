@@ -1,0 +1,1 @@
+# Models removed - using LLM analysis without local database
