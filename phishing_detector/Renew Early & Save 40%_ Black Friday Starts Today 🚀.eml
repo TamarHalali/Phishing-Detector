@@ -1,0 +1,549 @@
+Delivered-To: tyh444222@gmail.com
+Received: by 2002:a05:6f02:30a:b0:f2:6fa6:d4f5 with SMTP id 10csp2072109rcf;
+        Mon, 24 Nov 2025 09:05:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHkXGVMWHIRUw7hTedZDCFpOnK1zBcHqY0ROMNTvniyyGtcvQV2I5DUq4GPi/+QX+cyXY3v
+X-Received: by 2002:a05:620a:4721:b0:8b2:598d:6e78 with SMTP id af79cd13be357-8b33d1cfa05mr1460871085a.20.1764003915290;
+        Mon, 24 Nov 2025 09:05:15 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1764003915; cv=none;
+        d=google.com; s=arc-20240605;
+        b=fqgQAGnaQmi6kNls4e1qw6EqAubnEbH58ycdjPxRErzH0gF5ryW8WEpXcjgVisQJfc
+         DZ2hrG3A+4Yr2sYLmmAY4F76eS/NFHycBasEpGnXT61wFmJ/AGTFC+ZkRMbpA2pUXHbk
+         VXXPwNRrv5hcZIRLi2PSDi9qqTy4CzhdGoJn9M1owHUyMZV0mJQSLvl5sgRm9okEEnIN
+         smYfwiQHXAHePTWYzHM12ujqnivA8PbQznt2OJe+ccrBzzMFkBY+q9a3FCLFKwLZXMM/
+         P2ecyd3sjlYx4d0qonByoNVoQuuhtioPVwGPlTq0V/um9BqiU9Aec3ahbNU007tJgmlx
+         excw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=message-id:list-unsubscribe:list-unsubscribe-post:to:from:subject
+         :mime-version:date:dkim-signature:dkim-signature;
+        bh=oTZ1qPPWd2l5VLFoxebCqb7fjJMCCpLD41iWlzvfaos=;
+        fh=5pFV+h/QO0tj95VKfbzPTLF4Rls1gYcIjDiCFBNhRug=;
+        b=V/UJH9M4MO6Cjc9G0SY9+/RImpquhzdek8MLfaYvXtTxuLLND92Xv4/uS9y+oYjupp
+         AyYVpq7DHvGpL1g22yRue1woBQLL9maXM2MUNEat0Wp2uLUCm+pIBeCQvBaRRIs2dZl2
+         5vcTdTEyZ1LBUNg19IU3w/V0UxnsN+zeJB5TIlLMNlffM+fg0DC3is3fZo0wHrh0BOTP
+         AUFNWaPCY1AIioxCUnGjVx+pDgC2NNNIcMFmC28H5hIQ2ukTGeGocVjJhEli6BWZO8Lu
+         Xe3lT4UCbE6XneEBrWUPukAsATYNUANuV1uah9MxJ62QcBYLy+c0WWkmNhf36/OOFpvI
+         iIlw==;
+        dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@cio56239.tryhackme.com header.s=smtp header.b=WF30lMKU;
+       dkim=pass header.i=@mailgun.org header.s=mg header.b=Iel6QCTa;
+       spf=pass (google.com: domain of postmaster@cio56239.tryhackme.com designates 159.112.241.136 as permitted sender) smtp.mailfrom=postmaster@cio56239.tryhackme.com;
+       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=tryhackme.com
+Return-Path: <postmaster@cio56239.tryhackme.com>
+Received: from m241-136.mailgun.net (m241-136.mailgun.net. [159.112.241.136])
+        by mx.google.com with UTF8SMTPS id af79cd13be357-8b3295be6a8si379809085a.1088.2025.11.24.09.05.14
+        for <tyh444222@gmail.com>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 24 Nov 2025 09:05:15 -0800 (PST)
+Received-SPF: pass (google.com: domain of postmaster@cio56239.tryhackme.com designates 159.112.241.136 as permitted sender) client-ip=159.112.241.136;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@cio56239.tryhackme.com header.s=smtp header.b=WF30lMKU;
+       dkim=pass header.i=@mailgun.org header.s=mg header.b=Iel6QCTa;
+       spf=pass (google.com: domain of postmaster@cio56239.tryhackme.com designates 159.112.241.136 as permitted sender) smtp.mailfrom=postmaster@cio56239.tryhackme.com;
+       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=tryhackme.com
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=cio56239.tryhackme.com; q=dns/txt; s=smtp; t=1764003914; x=1764011114;
+ h=Message-Id: List-Unsubscribe: List-Unsubscribe-Post: To: To: From: From: Subject: Subject: Content-Type: Mime-Version: Date: X-Feedback-Id: Sender;
+ bh=oTZ1qPPWd2l5VLFoxebCqb7fjJMCCpLD41iWlzvfaos=;
+ b=WF30lMKUOb08DU3J2TPfmR1YdK+Ezx6Pd63j1uQllm9WMVvPZpe+Cwxh8G4fPdbZNF3UHdXOYJ+9/4R37g2UzlA7ooDvPr9nNzL+3PCLSu30ZbwP5xQBFzO5Ck3OYcXmAveZLB2pmMC1u2KhMTRMrrFxV3aUOX0dHwnpWfvwm14=
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mailgun.org; q=dns/txt; s=mg; t=1764003914; x=1764011114;
+ h=Message-Id: List-Unsubscribe: List-Unsubscribe-Post: To: To: From: From: Subject: Subject: Content-Type: Mime-Version: Date: X-Feedback-Id: Sender;
+ bh=oTZ1qPPWd2l5VLFoxebCqb7fjJMCCpLD41iWlzvfaos=;
+ b=Iel6QCTafAHmv+rtmiPLJzlc68/LMLokGwscydZb1I/J4851QLzGk5Hcsl0YfxBYF7I5nRZYNOqP8UtADz08i3hP3BcEcedhazVm+ubFT4MHfyDYcv+nS0xYXw8I4juTK9Ff7BWefUXDabYbmJl7F3tKeDGx/nCp9WMrBzUtkdQ=
+X-Mailgun-Sid: WyI1ODY3NCIsInR5aDQ0NDIyMkBnbWFpbC5jb20iLCIyODZkNWEiXQ==
+X-Feedback-Id: postmaster@cio56239.tryhackme.com::5eb3f9f45e348a34cf90b8e5:mailgun
+Received: by bc35f22416dedff7487411664420eda0cd987fefd9ff69705c43b4354e00658c with HTTP
+ id 69249045f3e49359757d3019; Mon, 24 Nov 2025 17:05:09 GMT
+X-Mailgun-Sending-Ip: 159.112.241.136
+Date: Mon, 24 Nov 2025 17:05:09 +0000
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="ef84a18f7fa0edc06732b50e8b705bdafca3950c012d2c2635d42b423704"
+Subject: =?UTF-8?q?Renew_Early_&_Save_40%:_Black_Friday_Starts_Today_=F0=9F=9A=80?=
+From: TryHackMe <donotreply@tryhackme.com>
+To: tyh444222@gmail.com
+X-Mailgun-Dkim: true
+X-Mailgun-Native-Send: true
+X-Mailgun-Track-Clicks: false
+X-Mailgun-Track-Opens: false
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+X-Mailer: Customer.io (dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw==;
+ +https://whatis.customeriomail.com)
+X-Report-Abuse-To: badactor@customer.io
+List-Unsubscribe: <mailto:32.MRTVISZRKFKUYQKNMFUWQZ2IIZXW6WKCIFNHCMRQGQ2G44SYOB2XEZCHNVTDQ3JYIF3T2PI=@unsubscribe2.customer.io>,
+ <https://e.customeriomail.com/unsubscribe/dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw==>
+X-Mailgun-Variables: {"email_id": "dgTK1QULAMaihgHFooYBAZq2044nrXpurdGmf8m8Aw=="}
+Message-Id: <20251124170509.c473f0558df31687@cio56239.tryhackme.com>
+
+--ef84a18f7fa0edc06732b50e8b705bdafca3950c012d2c2635d42b423704
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+
+TryHackMe Logo ( https://tryhackme.com/manage-account/subscription?utm_sour=
+ce=3Dcio&utm_medium=3Demail&utm_campaign=3Dblackfriday40RenewAnnualActive )
+
+40% Off Black Friday ( https://tryhackme.com/manage-account/subscription?ut=
+m_source=3Dcio&utm_medium=3Demail&utm_campaign=3Dblackfriday40RenewAnnualAc=
+tive )
+
+Offer Ends 28 Nov
+
+Hey t.y.h,
+
+Black Friday is here and for a limited time,
+you can renew your next annual cycle at 40% off.
+
+This is our biggest offer of the year, available only until 28th November.
+
+Renew Early at 40% Off ( https://tryhackme.com/manage-account/subscription?=
+utm_source=3Dcio&utm_medium=3Demail&utm_campaign=3Dblackfriday40RenewAnnual=
+Active )
+
+Here=E2=80=99s how your early renewal works:
+
+* Your payment today covers your next annual subscription cycle.
+* Your current subscription remains active until its usual renewal date.
+* When that date arrives, you=E2=80=99ll receive an invoice showing a 100% =
+discount, since you=E2=80=99ve already paid in advance.
+* No changes to your plan, no interruptions, no surprises, just guaranteed =
+savings for the year ahead.
+
+This Black Friday offer is available for a short time only. Secure your ren=
+ewal before the deal ends.
+
+Discord ( https://discord.gg/tryhackme )
+X ( https://twitter.com/tryhackme )
+Instagram ( https://instagram.com/realtryhackme )
+LinkedIn ( https://linkedin.com/company/tryhackme )
+YouTube ( https://youtube.com/@realtryhackme )
+
+Terms ( https://tryhackme.com/terms ) |
+Unsubscribe ( https://track.customer.io/unsubscribe/dgTK1QULAMaihgHFooYBAZq=
+2044nrXpurdGmf8m8Aw=3D=3D )
+
+=C2=A9 2025 TryHackMe. All rights reserved.
+
+*Renewal discount valid only for existing Annual Premium members.
+
+Applies exclusively to early renewal purchases of the annual plan and canno=
+t be combined with other discounts, including student offers.
+
+Renewal discount is applied to the next billing cycle only.
+--ef84a18f7fa0edc06732b50e8b705bdafca3950c012d2c2635d42b423704
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset="utf-8"
+
+<!DOCTYPE html><html lang=3D"en" style=3D"background-color: #151d2b;"><head=
+>
+  <meta charset=3D"utf-8"/>
+  <meta name=3D"viewport" content=3D"width=3Ddevice-width, initial-scale=3D=
+1"/>
+  <title>TryHackMe =E2=80=93 Black Friday Renewal</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=3DUbuntu:wght@400=
+;700&display=3Dswap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #151d2b;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    .wrapper {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #151d2b;
+    }
+    h1, h2 {
+      font-family: 'Ubuntu', sans-serif;
+      color: #a3ea2a;
+      margin-top: 0;
+    }
+    p {
+      color: #ffffff;
+      font-size: 17px;
+      line-height: 1.5;
+      margin: 0 0 8px;
+    }
+    .section {
+      background-color: #1c2538;
+      border-radius: 10px;
+      padding: 25px 40px;
+      margin-bottom: 20px;
+    }
+    .pill {
+      display: inline-block;
+      background: #2a344a;
+      color: #a3ea2a;
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 30px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .cta {
+      display: inline-block;
+      background-color: #a3ea2a;
+      color: #151d2b !important;
+      padding: 14px 30px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 17px;
+      border-radius: 5px;
+      text-align: center;
+      margin-top: 18px;
+    }
+
+    /* Step card =E2=80=94 simplified for universal rendering */
+    .content-card {
+      background-color: #151d2b;
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin: 20px auto 0;
+      max-width: 500px;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6);
+      border: 1px solid #232d44;
+      text-align: left;
+      color: #ffffff;
+      font-size: 17px;
+    }
+
+    .content-card ol {
+      margin: 12px 0 0;
+      padding-left: 22px;
+    }
+    .content-card li {
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .summary-bar {
+      background: #101624;
+      border-radius: 10px;
+      padding: 15px 20px;
+      font-size: 17px;
+      color: #ffffff;
+      text-align: center;
+      border: 1px solid #2e2e2d;
+      margin-top: 6px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: #f9f9fb;
+      font-size: 14px;
+    }
+    .social-icons img {
+      width: 32px;
+      height: auto;
+      margin: 0 5px 30px;
+    }
+    .legal a {
+      color: #ffffff;
+      text-decoration: underline;
+      margin: 0 5px;
+    }
+
+    @media screen and (max-width: 600px) {
+      .wrapper {
+        padding: 10px;
+      }
+      .section {
+        padding: 20px 18px;
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .email-body {
+        background-color: #121212 !important;
+        color: #e6e6e6 !important;
+      }
+    }
+  </style>
+<style>.c1x30091{max-width:100% !important;}.covbl52{mso-ansi-font-size:0;}=
+</style></head>
+<body style=3D"background-color: #151d2b; margin: 0; padding: 0;"><div styl=
+e=3D"display: none">This Black Friday only | Renew your annual plan early a=
+nd lock in 40% savings =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=
+=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=
+=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=
+=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =
+=E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=
+=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=
+=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=
+=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=
+=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =
+=E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=
+=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=
+=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=
+=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=
+=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =
+=E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=
+=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=
+=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=
+=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=
+=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =
+=E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=
+=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=
+=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=
+=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=
+=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =
+=E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=
+=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=
+=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=
+=8F =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =
+=C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=
+=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =
+=C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=
+=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =
+=C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=
+=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =
+=C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=
+=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =
+=C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=
+=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =
+=C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD=C2=A0</div>
+  <div class=3D"wrapper">
+
+    <!-- Logo -->
+   =20
+ =20
+   =20
+     =20
+       =20
+       =20
+          <div style=3D"overflow: auto;">
+           =20
+      <div style=3D"text-align: center; margin-bottom: 20px;">
+       =20
+  <div style=3D"text-align: center;" class=3D"covbl52">
+  <a href=3D"https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEsxUVVMQ=
+U1haWhnSEZvb1lCQVpxMjA0NG5yWHB1cmRHbWY4bThBdz09IiwiaHJlZiI6Imh0dHBzOi8vdHJ5=
+aGFja21lLmNvbS9tYW5hZ2UtYWNjb3VudC9zdWJzY3JpcHRpb24_dXRtX3NvdXJjZT1jaW9cdTA=
+wMjZ1dG1fbWVkaXVtPWVtYWlsXHUwMDI2dXRtX2NhbXBhaWduPWJsYWNrZnJpZGF5NDBSZW5ld0=
+FubnVhbEFjdGl2ZSIsImludGVybmFsIjoiY2FkNTA1NDk5NTRkYzZhMjg2MDEiLCJsaW5rX2lkI=
+joyNTMwN30/ee858e77cde497427179f072bef0520ce04c3b7d93952f16f66e1a58f0e0dd8f=
+" style=3D"text-decoration: none; display: inline-block;">
+     =20
+     =20
+       =20
+          <img class=3D"c1x30091" src=3D"https://userimg-bee.customeriomail=
+=2Ecom/images/client-env-92874/THMlogo=
+-gray_scale.png" alt=3D"TryHackMe Logo"=
+ width=3D"118" style=3D"vertical-align: middle; max-width: 100%; width: 118=
+;height:auto;"/>
+       =20
+        </a></div>
+ =20
+      </div>
+   =20
+          </div>
+         =20
+     =20
+       =20
+     =20
+ =20
+ =20
+
+    <!-- Banner -->
+   =20
+ =20
+   =20
+     =20
+       =20
+       =20
+          <div style=3D"overflow: auto;">
+           =20
+      <div style=3D"margin-bottom: 20px;">
+       =20
+  <div style=3D"text-align: center;" class=3D"covbl52">
+  <a href=3D"https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEsxUVVMQ=
+U1haWhnSEZvb1lCQVpxMjA0NG5yWHB1cmRHbWY4bThBdz09IiwiaHJlZiI6Imh0dHBzOi8vdHJ5=
+aGFja21lLmNvbS9tYW5hZ2UtYWNjb3VudC9zdWJzY3JpcHRpb24_dXRtX3NvdXJjZT1jaW9cdTA=
+wMjZ1dG1fbWVkaXVtPWVtYWlsXHUwMDI2dXRtX2NhbXBhaWduPWJsYWNrZnJpZGF5NDBSZW5ld0=
+FubnVhbEFjdGl2ZSIsImludGVybmFsIjoiY2FkNTA1NDk5NTRkYzZhMjg2MDEiLCJsaW5rX2lkI=
+joyNTMwN30/ee858e77cde497427179f072bef0520ce04c3b7d93952f16f66e1a58f0e0dd8f=
+" style=3D"width: 100%; text-decoration: none; display: inline-block;">
+     =20
+     =20
+       =20
+          <img class=3D"c1x30091" src=3D"https://userimg-assets.customeriom=
+ail.com/images/client-env-92874/1763664567812_BlackFriday_Laucnh_Annual_202=
+5_01KAH9K7WCF7XK3ER7P56T4VMJ.png" alt=3D"40% Off Black Friday" width=3D"600=
+" style=3D"vertical-align: middle; width: 100%;height:auto;"/>
+       =20
+        </a></div>
+ =20
+      </div>
+   =20
+          </div>
+         =20
+     =20
+       =20
+     =20
+ =20
+ =20
+
+    <!-- Main Section -->
+   =20
+ =20
+   =20
+     =20
+       =20
+       =20
+          <div style=3D"overflow: auto;">
+           =20
+      <div class=3D"section" style=3D"text-align:center;">
+        <div style=3D"margin-bottom:12px;">
+          <span class=3D"pill">Offer Ends 28 Nov</span>
+        </div>
+
+     =20
+
+        <p style=3D"color:#d5d9e6;">Hey t.y.h,</p>
+
+        <p style=3D"color:#d5d9e6;">
+          Black Friday is here and for a limited time, <br/>you can renew y=
+our next annual cycle at 40% off.
+        </p>
+
+        <p>
+          This is our biggest offer of the year, available only until <stro=
+ng>28th November.</strong>
+        </p>
+
+       =20
+
+        <!-- CTA (moved before steps) -->
+        <a class=3D"cta" href=3D"https://e.customeriomail.com/e/c/eyJlbWFpb=
+F9pZCI6ImRnVEsxUVVMQU1haWhnSEZvb1lCQVpxMjA0NG5yWHB1cmRHbWY4bThBdz09IiwiaHJl=
+ZiI6Imh0dHBzOi8vdHJ5aGFja21lLmNvbS9tYW5hZ2UtYWNjb3VudC9zdWJzY3JpcHRpb24_dXR=
+tX3NvdXJjZT1jaW9cdTAwMjZ1dG1fbWVkaXVtPWVtYWlsXHUwMDI2dXRtX2NhbXBhaWduPWJsYW=
+NrZnJpZGF5NDBSZW5ld0FubnVhbEFjdGl2ZSIsImludGVybmFsIjoiY2FkNTA1NDk5NTRkYzZhM=
+jg2MDEiLCJsaW5rX2lkIjoyNTMwN30/ee858e77cde497427179f072bef0520ce04c3b7d9395=
+2f16f66e1a58f0e0dd8f">
+          Renew Early at 40% Off
+        </a>
+
+        <!-- Step-by-step card -->
+        <div class=3D"content-card">
+          <p style=3D"color:#a3ea2a; font-weight:bold; margin-bottom:10px; =
+font-size:18px;">
+            Here=E2=80=99s how your early renewal works:
+          </p>
+
+          <ol>
+            <li><strong>Your payment today</strong> covers your <em>next</e=
+m> annual subscription cycle.</li>
+            <li><strong>Your current subscription</strong> remains active u=
+ntil its usual renewal date.</li>
+            <li>When that date arrives, you=E2=80=99ll receive an invoice s=
+howing a <strong>100% discount</strong>, since you=E2=80=99ve already paid =
+in advance.</li>
+            <li><strong>No changes</strong> to your plan, no interruptions,=
+ no surprises, just guaranteed savings for the year ahead.</li>
+          </ol>
+        </div>
+
+      </div>
+   =20
+          </div>
+         =20
+     =20
+       =20
+     =20
+ =20
+ =20
+
+    <!-- Urgency Bar -->
+   =20
+ =20
+   =20
+     =20
+       =20
+       =20
+          <div style=3D"overflow: auto;">
+           =20
+      <div class=3D"summary-bar">
+        This Black Friday offer is available for a short time only. Secure =
+your renewal before the deal ends.
+      </div>
+   =20
+          </div>
+         =20
+     =20
+       =20
+     =20
+ =20
+ =20
+
+    <!-- Footer -->
+    <div class=3D"footer">
+      <div class=3D"social-icons">
+        <a href=3D"https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEs=
+xUVVMQU1haWhnSEZvb1lCQVpxMjA0NG5yWHB1cmRHbWY4bThBdz09IiwiaHJlZiI6Imh0dHBzOi=
+8vZGlzY29yZC5nZy90cnloYWNrbWUiLCJpbnRlcm5hbCI6ImNhZDUwNTQ5OTU0ZGM2YTI4NjAxI=
+iwibGlua19pZCI6MjIzNDF9/e6fa19f01cb2005d3c11f1b33c0b88f37501634d811b9050648=
+610ccf90b5395"><img src=3D"https://app-rsrc.getbee.io/public/resources/soci=
+al-networks-icon-sets/t-only-logo-white/discord@2x.png" alt=3D"Discord"/></=
+a>
+        <a href=3D"https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEs=
+xUVVMQU1haWhnSEZvb1lCQVpxMjA0NG5yWHB1cmRHbWY4bThBdz09IiwiaHJlZiI6Imh0dHBzOi=
+8vdHdpdHRlci5jb20vdHJ5aGFja21lIiwiaW50ZXJuYWwiOiJjYWQ1MDU0OTk1NGRjNmEyODYwM=
+SIsImxpbmtfaWQiOjIyMTk3fQ/bb49abf0250455acabfc6b7244acf08fa8cc4b785e676cff6=
+a553e87e530d96f"><img src=3D"https://app-rsrc.getbee.io/public/resources/so=
+cial-networks-icon-sets/t-only-logo-white/twitter@2x.png" alt=3D"X"/></a>
+        <a href=3D"https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEs=
+xUVVMQU1haWhnSEZvb1lCQVpxMjA0NG5yWHB1cmRHbWY4bThBdz09IiwiaHJlZiI6Imh0dHBzOi=
+8vaW5zdGFncmFtLmNvbS9yZWFsdHJ5aGFja21lIiwiaW50ZXJuYWwiOiJjYWQ1MDU0OTk1NGRjN=
+mEyODYwMSIsImxpbmtfaWQiOjN9/2373faf2d87e43ed02ccd47e12b1167f3c2bc444be8db6d=
+2dc4ad4e4014a2343"><img src=3D"https://app-rsrc.getbee.io/public/resources/=
+social-networks-icon-sets/t-only-logo-white/instagram@2x.png" alt=3D"Instag=
+ram"/></a>
+        <a href=3D"https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEs=
+xUVVMQU1haWhnSEZvb1lCQVpxMjA0NG5yWHB1cmRHbWY4bThBdz09IiwiaHJlZiI6Imh0dHBzOi=
+8vbGlua2VkaW4uY29tL2NvbXBhbnkvdHJ5aGFja21lIiwiaW50ZXJuYWwiOiJjYWQ1MDU0OTk1N=
+GRjNmEyODYwMSIsImxpbmtfaWQiOjIyMTk5fQ/e4506eb9e104022f7017f69ee91d30a544633=
+b41635c6cd95fada2bc67770844"><img src=3D"https://app-rsrc.getbee.io/public/=
+resources/social-networks-icon-sets/t-only-logo-white/linkedin@2x.png" alt=
+=3D"LinkedIn"/></a>
+        <a href=3D"https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEs=
+xUVVMQU1haWhnSEZvb1lCQVpxMjA0NG5yWHB1cmRHbWY4bThBdz09IiwiaHJlZiI6Imh0dHBzOi=
+8veW91dHViZS5jb20vQHJlYWx0cnloYWNrbWUiLCJpbnRlcm5hbCI6ImNhZDUwNTQ5OTU0ZGM2Y=
+TI4NjAxIiwibGlua19pZCI6MjI0MzF9/790f221ebf9a24744306d3e7edccd63b8d384f9d939=
+e44e6d8c6d49185a7324e"><img src=3D"https://app-rsrc.getbee.io/public/resour=
+ces/social-networks-icon-sets/t-only-logo-white/youtube@2x.png" alt=3D"YouT=
+ube"/></a>
+      </div>
+
+      <div class=3D"legal" style=3D"margin-bottom:10px;">
+        <a href=3D"https://e.customeriomail.com/e/c/eyJlbWFpbF9pZCI6ImRnVEs=
+xUVVMQU1haWhnSEZvb1lCQVpxMjA0NG5yWHB1cmRHbWY4bThBdz09IiwiaHJlZiI6Imh0dHBzOi=
+8vdHJ5aGFja21lLmNvbS90ZXJtcyIsImludGVybmFsIjoiY2FkNTA1NDk5NTRkYzZhMjg2MDEiL=
+CJsaW5rX2lkIjoxMH0/46e2b053980c21c0c2e36ba0b5e8f9eb1630aece86e28d104962b2e7=
+a73345e9">Terms</a> |
+        <a href=3D"https://e.customeriomail.com/unsubscribe/dgTK1QULAMaihgH=
+FooYBAZq2044nrXpurdGmf8m8Aw=3D=3D">Unsubscribe</a>
+      </div>
+
+      <div>=C2=A9 2025 TryHackMe. All rights reserved.</div>
+    </div>
+
+  </div>
+
+  <!-- Disclaimer -->
+  <div style=3D"text-align: center; padding: 15px 20px 30px; font-size: 12p=
+x; color: #888888; line-height: 1.4;">
+    *Renewal discount valid only for existing Annual Premium members.<br/>
+    Applies exclusively to early renewal purchases of the annual plan and c=
+annot be combined with other discounts, including student offers.<br/>
+    Renewal discount is applied to the next billing cycle only.
+  </div>
+
+
+<img src=3D"https://e.customeriomail.com/e/o/eyJlbWFpbF9pZCI6ImRnVEsxUVVMQU=
+1haWhnSEZvb1lCQVpxMjA0NG5yWHB1cmRHbWY4bThBdz09In0=3D" style=3D"height: 1px =
+!important; max-height: 1px !important; max-width: 1px !important; width: 1=
+px !important; display: none !important;" alt=3D""/></body></html>
+--ef84a18f7fa0edc06732b50e8b705bdafca3950c012d2c2635d42b423704--
