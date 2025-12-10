@@ -12,7 +12,7 @@ function HistoryTable({ onEmailSelect }) {
   const fetchHistory = async () => {
     try {
       const response = await axios.get('/history');
-      setEmails(response.data);
+      setEmails(response.data.emails || []);
     } catch (error) {
       console.error('Error fetching history:', error);
     } finally {

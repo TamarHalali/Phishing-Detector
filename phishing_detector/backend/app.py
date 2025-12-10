@@ -5,12 +5,35 @@ import os
 import socket
 import uuid
 import time
+import pymysql
 from datetime import datetime
+
+def wait_for_mysql():
+    max_retries = 30
+    for i in range(max_retries):
+        try:
+            connection = pymysql.connect(
+                host='mysql',
+                user='phishing_user',
+                password='phishing_pass',
+                database='phishing_db'
+            )
+            connection.close()
+            print(f"MySQL connected after {i+1} attempts")
+            return True
+        except:
+            print(f"Waiting for MySQL... ({i+1}/{max_retries})")
+            time.sleep(2)
+    return False
+
+if not wait_for_mysql():
+    print("FATAL: Cannot connect to MySQL")
+    exit(1)
 
 app = Flask(__name__)
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///phishing.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://phishing_user:phishing_pass@mysql:3306/phishing_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
