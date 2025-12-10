@@ -51,3 +51,16 @@ jobs:
         cd phishing_detector/backend
         python -m pytest test_db.py -v
     
+    - name: Install Docker Compose
+      run: |
+        sudo curl -L "https://github.com/docker/compose/releases/download/v2.21.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+    
+    - name: Test with Docker Compose
+      run: |
+        cd phishing_detector
+        docker-compose -f docker-compose.yml up -d --build
+        sleep 30
+        docker-compose exec -T backend python -m pytest test_db.py -v
+        docker-compose down
+    
