@@ -51,10 +51,3 @@ jobs:
         cd phishing_detector/backend
         python -m pytest test_db.py -v
     
-    - name: Test with Docker Compose
-      run: |
-        cd phishing_detector
-        docker-compose -f docker-compose.yml up -d --build
-        sleep 30
-        docker-compose exec -T backend python -m pytest test_db.py -v
-        docker-compose down
