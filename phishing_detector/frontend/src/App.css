@@ -26,6 +26,18 @@ header h1 {
   -webkit-text-fill-color: transparent;
 }
 
+.container-info {
+  background: rgba(102, 126, 234, 0.1);
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 0.9em;
+  color: #495057;
+  text-align: center;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
 nav {
   text-align: center;
 }

@@ -43,7 +43,8 @@ def upload_email():
         return jsonify({
             'id': email_record.id,
             'parsed_email': parsed_email,
-            'ai_analysis': ai_result
+            'ai_analysis': ai_result,
+            'container_info': request.container_info
         })
     
     except Exception as e:
@@ -61,7 +62,8 @@ def analyze():
         
         return jsonify({
             'parsed_email': parsed_email,
-            'ai_analysis': ai_result
+            'ai_analysis': ai_result,
+            'container_info': request.container_info
         })
     
     except Exception as e:
@@ -70,9 +72,15 @@ def analyze():
 @email_bp.route('/history', methods=['GET'])
 def history():
     emails = EmailAnalysis.query.order_by(EmailAnalysis.timestamp.desc()).all()
-    return jsonify([email.to_dict() for email in emails])
+    return jsonify({
+        'emails': [email.to_dict() for email in emails],
+        'container_info': request.container_info
+    })
 
 @email_bp.route('/email/<int:email_id>', methods=['GET'])
 def get_email(email_id):
     email = EmailAnalysis.query.get_or_404(email_id)
-    return jsonify(email.to_dict())
+    return jsonify({
+        'email': email.to_dict(),
+        'container_info': request.container_info
+    })

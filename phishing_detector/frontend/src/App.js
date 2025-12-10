@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import UploadEmail from './components/UploadEmail';
 import ScanResult from './components/ScanResult';
 import HistoryTable from './components/HistoryTable';
@@ -10,6 +10,14 @@ function App() {
   const [currentView, setCurrentView] = useState('upload');
   const [scanResult, setScanResult] = useState(null);
   const [selectedEmailId, setSelectedEmailId] = useState(null);
+  const [containerInfo, setContainerInfo] = useState(null);
+
+  useEffect(() => {
+    fetch('/container-info')
+      .then(res => res.json())
+      .then(data => setContainerInfo(data))
+      .catch(err => console.error('Failed to fetch container info:', err));
+  }, [currentView]);
 
   const handleScanComplete = (result) => {
     setScanResult(result);
@@ -25,6 +33,11 @@ function App() {
     <div className="App">
       <header>
         <h1>Phishing Email Detector</h1>
+        {containerInfo && (
+          <div className="container-info">
+            <small>Container: {containerInfo.container_id} | Host: {containerInfo.hostname} | Requests: {containerInfo.requests_handled}</small>
+          </div>
+        )}
         <nav>
           <button onClick={() => setCurrentView('upload')}>Upload Email</button>
           <button onClick={() => setCurrentView('history')}>History</button>
