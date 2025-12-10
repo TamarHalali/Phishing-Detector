@@ -10,57 +10,33 @@ jobs:
   test:
     runs-on: ubuntu-latest
     
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: rootpassword
-          MYSQL_DATABASE: phishing_db
-          MYSQL_USER: phishing_user
-          MYSQL_PASSWORD: phishing_pass
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
 
     steps:
     - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        cd phishing_detector/backend
-        pip install -r requirements.txt
-    
-    - name: Wait for MySQL
-      run: |
-        while ! mysqladmin ping -h"127.0.0.1" --silent; do
-          sleep 1
-        done
-    
-    - name: Run tests
-      env:
-        DATABASE_URL: mysql+pymysql://phishing_user:phishing_pass@127.0.0.1:3306/phishing_db
-        GEMINI_API_KEY: test_key
-        OPENAI_API_KEY: test_key
-        VIRUSTOTAL_API_KEY: test_key
-      run: |
-        cd phishing_detector/backend
-        python -m pytest test_db.py -v
     
     - name: Install Docker Compose
       run: |
         sudo curl -L "https://github.com/docker/compose/releases/download/v2.21.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
         sudo chmod +x /usr/local/bin/docker-compose
     
-    - name: Test with Docker Compose
+    - name: Start Docker Compose
       run: |
         cd phishing_detector
         docker-compose -f docker-compose.yml up -d --build
-        sleep 30
+    
+    - name: Wait for Database
+      run: |
+        cd phishing_detector
+        timeout 120 bash -c 'until docker-compose exec -T mysql mysqladmin ping -h localhost --silent; do sleep 2; done'
+    
+    - name: Run Tests
+      run: |
+        cd phishing_detector
         docker-compose exec -T backend python -m pytest test_db.py -v
+    
+    - name: Cleanup
+      run: |
+        cd phishing_detector
         docker-compose down
     
