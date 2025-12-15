@@ -69,5 +69,5 @@ jobs:
         export VIRUSTOTAL_API_KEY="${{ secrets.VIRUSTOTAL_API_KEY }}"
         docker-compose -f docker-compose.yml up -d --build
         sleep 30
-        docker-compose exec -T backend python -m pytest tests/test_db.py -v || echo "Docker test completed"
+        docker-compose exec -T backend sh -c "cd /app && python -m pytest tests/test_db.py -v" || echo "Docker test completed"
         docker-compose down
