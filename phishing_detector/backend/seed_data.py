@@ -7,12 +7,12 @@ def seed_database():
         # Create tables
         db.create_all()
         
-        # Add untrusted domains if they don't exist
+        # Add known suspicious domains if they don't exist
         untrusted_domains = [
-            ('tempmail.com', 80),
-            ('guerrillamail.com', 85),
-            ('10minutemail.com', 90),
-            ('mailinator.com', 75)
+            ('tempmail.com', 60),
+            ('guerrillamail.com', 65),
+            ('10minutemail.com', 70),
+            ('mailinator.com', 55)
         ]
         
         for domain, risk_score in untrusted_domains:
@@ -20,11 +20,11 @@ def seed_database():
                 untrusted_domain = UntrustedDomain(domain=domain, risk_score=risk_score)
                 db.session.add(untrusted_domain)
         
-        # Add untrusted URLs if they don't exist
+        # Add known suspicious URL patterns if they don't exist
         untrusted_urls = [
-            ('http://bit.ly/suspicious', 70),
-            ('http://tinyurl.com/phish', 75),
-            ('https://fake-bank.com', 95)
+            ('bit.ly', 40),
+            ('tinyurl.com', 35),
+            ('t.co', 30)
         ]
         
         for url, risk_score in untrusted_urls:

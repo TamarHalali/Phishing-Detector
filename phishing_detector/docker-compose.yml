@@ -24,9 +24,9 @@ services:
     environment:
       - FLASK_ENV=production
       - DATABASE_URL=mysql+pymysql://phishing_user:phishing_pass@mysql:3306/phishing_db
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-demo_key}
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-demo_key}
-      - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY:-demo_key}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
     depends_on:
       mysql:
         condition: service_healthy
