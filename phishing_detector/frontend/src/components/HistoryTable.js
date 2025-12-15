@@ -43,7 +43,7 @@ function HistoryTable({ onEmailSelect }) {
         </thead>
         <tbody>
           {emails.map(email => (
-            <tr key={email.id} onClick={() => onEmailSelect(email.id)}>
+            <tr key={email.id}>
               <td>{new Date(email.timestamp).toLocaleDateString()}</td>
               <td>{email.sender}</td>
               <td>{email.subject}</td>

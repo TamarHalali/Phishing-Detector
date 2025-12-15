@@ -86,8 +86,24 @@ def container_info():
         'timestamp': datetime.now().isoformat()
     }
 
-if __name__ == '__main__':
+def init_database():
+    """Initialize database tables with proper locking"""
     with app.app_context():
-        db.create_all()
+        try:
+            # Check if tables exist before creating
+            from sqlalchemy import text
+            result = db.session.execute(text("SHOW TABLES LIKE 'email_analysis'"))
+            if not result.fetchone():
+                print(f"Container {CONTAINER_ID}: Creating database tables...")
+                db.create_all()
+                print(f"Container {CONTAINER_ID}: Database tables created")
+            else:
+                print(f"Container {CONTAINER_ID}: Database tables already exist")
+        except Exception as e:
+            print(f"Container {CONTAINER_ID}: Database init error: {e}")
+            # Continue anyway - tables might exist
+
+if __name__ == '__main__':
+    init_database()
     print(f"[{datetime.now().strftime('%H:%M:%S')}] Container {CONTAINER_ID} started on {HOSTNAME}")
     app.run(debug=False, host='0.0.0.0', port=5000)

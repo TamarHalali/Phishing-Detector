@@ -7,15 +7,12 @@ class EmailAnalysis(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     sender = db.Column(db.String(255), nullable=False)
-    subject = db.Column(db.Text)
-    body = db.Column(db.Text)
-    urls = db.Column(db.Text)  # JSON string
-    attachments = db.Column(db.Text)  # JSON string
+    subject = db.Column(db.String(500))
+    sender_domain = db.Column(db.String(255))
     ai_score = db.Column(db.Integer)
+    risk_level = db.Column(db.String(50))  # Low, Medium, High, Critical
     ai_summary = db.Column(db.Text)
-    ai_indicators = db.Column(db.Text)  # JSON string
-    ai_detections = db.Column(db.Text)  # JSON string
-    url_analysis = db.Column(db.Text)  # JSON string
+    threat_indicators = db.Column(db.Text)  # JSON string - key findings only
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     
     def to_dict(self):
@@ -23,23 +20,12 @@ class EmailAnalysis(db.Model):
             'id': self.id,
             'sender': self.sender,
             'subject': self.subject,
+            'sender_domain': self.sender_domain,
             'ai_score': self.ai_score,
+            'risk_level': self.risk_level,
             'ai_summary': self.ai_summary,
-            'timestamp': self.timestamp.isoformat(),
-            'parsed_email': {
-                'sender': self.sender,
-                'subject': self.subject,
-                'body': self.body,
-                'urls': json.loads(self.urls) if self.urls else [],
-                'attachments': json.loads(self.attachments) if self.attachments else []
-            },
-            'ai_analysis': {
-                'score': self.ai_score,
-                'summary': self.ai_summary,
-                'indicators': json.loads(self.ai_indicators) if self.ai_indicators else [],
-                'detections': json.loads(self.ai_detections) if self.ai_detections else [],
-                'url_analysis': json.loads(self.url_analysis) if self.url_analysis else []
-            }
+            'threat_indicators': json.loads(self.threat_indicators) if self.threat_indicators else [],
+            'timestamp': self.timestamp.isoformat()
         }
 
 class MaliciousDomain(db.Model):
