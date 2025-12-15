@@ -59,12 +59,23 @@ jobs:
         echo "GitHub will send you email notifications automatically."
     
     - name: Test with Docker Compose
-      env:
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
       run: |
+        # Create temporary .env for docker-compose
+        echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env.temp
+        echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env.temp
+        echo "VIRUSTOTAL_API_KEY=${{ secrets.VIRUSTOTAL_API_KEY }}" >> .env.temp
+        
+        # Use the temp env file
+        cp .env.temp .env
+        
+        # Start docker-compose
         docker-compose -f docker-compose.yml up -d --build
-        sleep 30
-        docker-compose exec -T backend python -m pytest tests/ -v || echo "Docker test completed"
+        sleep 45
+        
+        # Run tests in container
+        docker-compose exec -T backend sh -c "cd /app && python -m pytest tests/test_db.py -v"
+        
+        # Cleanup
         docker-compose down
+        rm -f .env .env.temp
+    
