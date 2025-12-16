@@ -35,11 +35,11 @@ def test_email_creation(client):
         email = EmailAnalysis(
             sender='test@example.com',
             subject='Test Email',
-            body='Test body',
-            urls='[]',
-            attachments='[]',
-            ai_score=0.5,
-            ai_summary='Test summary'
+            sender_domain='example.com',
+            ai_score=85,
+            risk_level='Medium',
+            ai_summary='Test summary',
+            threat_indicators='[]'
         )
         db.session.add(email)
         db.session.commit()
