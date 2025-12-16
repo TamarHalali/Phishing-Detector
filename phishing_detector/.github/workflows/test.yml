@@ -50,7 +50,7 @@ jobs:
         VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
       run: |
         cd backend
-        python -m pytest tests/test_db.py -v
+        python -m pytest tests/ -v
     
     - name: Tests completed successfully
       if: success()
@@ -73,7 +73,7 @@ jobs:
         sleep 45
         
         # Run tests in container
-        docker-compose exec -T backend sh -c "cd /app && python -m pytest tests/test_db.py -v"
+        docker-compose exec -T backend sh -c "cd /app && python -m pytest tests/ -v"
         
         # Cleanup
         docker-compose down
