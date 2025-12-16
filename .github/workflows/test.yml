@@ -21,6 +21,10 @@ jobs:
         sudo chmod +x /usr/local/bin/docker-compose
     
     - name: Start Docker Compose
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
       run: |
         cd phishing_detector
         docker-compose -f docker-compose.yml up -d --build

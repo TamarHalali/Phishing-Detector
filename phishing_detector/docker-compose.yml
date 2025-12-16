@@ -31,8 +31,6 @@ services:
       mysql:
         condition: service_healthy
     restart: unless-stopped
-    deploy:
-      replicas: 3
 
   nginx:
     image: nginx:alpine
