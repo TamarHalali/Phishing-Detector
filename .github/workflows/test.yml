@@ -55,4 +55,33 @@ jobs:
       run: |
         cd phishing_detector
         docker-compose down
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    if: needs.test.result == 'success'
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Login to Docker Hub
+      env:
+        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      run: echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+    
+    - name: Build and Push Backend Image
+      env:
+        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      run: |
+        cd phishing_detector/backend
+        docker build -t $DOCKERHUB_USERNAME/phishing-detector-backend:latest .
+        docker push $DOCKERHUB_USERNAME/phishing-detector-backend:latest
+    
+    - name: Build and Push Frontend Image
+      env:
+        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      run: |
+        cd phishing_detector/frontend
+        docker build -t $DOCKERHUB_USERNAME/phishing-detector-frontend:latest .
+        docker push $DOCKERHUB_USERNAME/phishing-detector-frontend:latest
     
