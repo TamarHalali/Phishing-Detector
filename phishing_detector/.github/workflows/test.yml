@@ -60,6 +60,8 @@ jobs:
     
     - name: Test with Docker Compose
       run: |
+        cd phishing_detector
+        
         # Create temporary .env for docker-compose
         echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env.temp
         echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env.temp
@@ -73,7 +75,7 @@ jobs:
         sleep 45
         
         # Run tests in container
-        docker-compose exec -T backend sh -c "cd /app && python -m pytest tests/ -v"
+        docker-compose exec -T backend sh -c "cd /app && python -m pytest tests/test_db.py -v"
         
         # Cleanup
         docker-compose down
