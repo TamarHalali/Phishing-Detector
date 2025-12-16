@@ -33,7 +33,7 @@ jobs:
     - name: Run Tests
       run: |
         cd phishing_detector
-        docker-compose exec -T backend python -m pytest test_db.py -v
+        docker-compose exec -T backend python -m pytest tests/test_db.py -v
     
     - name: Cleanup
       run: |
