@@ -127,15 +127,7 @@ jobs:
     - name: Create GitHub Release
       if: steps.backend_build.outputs.success == 'true' && steps.frontend_build.outputs.success == 'true'
       run: |
-        # Delete existing release and tag if they exist
-        curl -X DELETE \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          https://api.github.com/repos/${{ github.repository }}/releases/tags/v${{ steps.version.outputs.version }} 2>/dev/null || true
-        
-        git tag -d v${{ steps.version.outputs.version }} 2>/dev/null || true
-        git push origin :refs/tags/v${{ steps.version.outputs.version }} 2>/dev/null || true
-        
-        # Create new release
+        # Create new release (don't delete existing ones)
         curl -X POST \
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
@@ -147,5 +139,5 @@ jobs:
             "body": "🚀 **Phishing Detector v${{ steps.version.outputs.version }}**\n\n**Docker Images:**\n- \`${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:${{ steps.version.outputs.version }}\`\n- \`${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }}\`\n\n**Changes:**\n- Auto-incremented from ${{ steps.version.outputs.current }}\n- Tests passed ✅\n- Images published to Docker Hub 🐳",
             "draft": false,
             "prerelease": false
-          }'
+          }' || echo "Release might already exist, continuing..."
     
