@@ -7,7 +7,118 @@ on:
     branches: [ main, master ]
 
 jobs:
+  dependency-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install Python dependencies and scan
+      run: |
+        cd phishing_detector/backend
+        pip install --upgrade pip
+        pip install pip-audit safety
+        pip install -r requirements.txt
+        pip install -r requirements-test.txt
+        
+        echo "🔍 Running pip-audit for Python dependencies..."
+        pip-audit --format=json --output=pip-audit-results.json || true
+        pip-audit --format=text
+        
+        echo "🔍 Running Safety scan..."
+        safety check --json --output=safety-results.json || true
+        safety check
+        
+        # Check for HIGH/CRITICAL vulnerabilities
+        if pip-audit --format=json | jq -e '.vulnerabilities[] | select(.aliases[].id | test("HIGH|CRITICAL"; "i"))' > /dev/null 2>&1; then
+          echo "❌ HIGH/CRITICAL vulnerabilities found in Python dependencies!"
+          exit 1
+        fi
+    
+    - name: Install Node.js dependencies and scan
+      run: |
+        cd phishing_detector/frontend
+        npm install
+        
+        echo "🔍 Running npm audit..."
+        npm audit --audit-level=high --json > npm-audit-results.json || true
+        npm audit --audit-level=high
+        
+        # Check for HIGH/CRITICAL vulnerabilities
+        if npm audit --audit-level=high --json | jq -e '.vulnerabilities | to_entries[] | select(.value.severity == "high" or .value.severity == "critical")' > /dev/null 2>&1; then
+          echo "❌ HIGH/CRITICAL vulnerabilities found in Node.js dependencies!"
+          exit 1
+        fi
+    
+    - name: Docker Image Security Scan
+      run: |
+        # Install Trivy for container scanning
+        sudo apt-get update
+        sudo apt-get install wget apt-transport-https gnupg lsb-release
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+        echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update
+        sudo apt-get install trivy
+        
+        echo "🔍 Scanning Docker base images..."
+        trivy image --severity HIGH,CRITICAL --format json --output python-base-scan.json python:3.11-slim || true
+        trivy image --severity HIGH,CRITICAL python:3.11-slim
+        
+        trivy image --severity HIGH,CRITICAL --format json --output node-base-scan.json node:18-alpine || true
+        trivy image --severity HIGH,CRITICAL node:18-alpine
+        
+        trivy image --severity HIGH,CRITICAL --format json --output mysql-base-scan.json mysql:8.0 || true
+        trivy image --severity HIGH,CRITICAL mysql:8.0
+        
+        # Check if any HIGH/CRITICAL vulnerabilities found
+        if trivy image --severity HIGH,CRITICAL --format json python:3.11-slim | jq -e '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")' > /dev/null 2>&1; then
+          echo "❌ HIGH/CRITICAL vulnerabilities found in Python base image!"
+          exit 1
+        fi
+        
+        if trivy image --severity HIGH,CRITICAL --format json node:18-alpine | jq -e '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")' > /dev/null 2>&1; then
+          echo "❌ HIGH/CRITICAL vulnerabilities found in Node.js base image!"
+          exit 1
+        fi
+        
+        if trivy image --severity HIGH,CRITICAL --format json mysql:8.0 | jq -e '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")' > /dev/null 2>&1; then
+          echo "❌ HIGH/CRITICAL vulnerabilities found in MySQL base image!"
+          exit 1
+        fi
+    
+    - name: Upload scan results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: dependency-scan-results
+        path: |
+          phishing_detector/backend/pip-audit-results.json
+          phishing_detector/backend/safety-results.json
+          phishing_detector/frontend/npm-audit-results.json
+          python-base-scan.json
+          node-base-scan.json
+          mysql-base-scan.json
+    
+    - name: Upload built images scan results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: built-images-scan-results
+        path: |
+          backend-built-scan.json
+          frontend-built-scan.json
+
   test:
+    needs: dependency-scan
     runs-on: ubuntu-latest
     
 
@@ -57,7 +168,7 @@ jobs:
         docker-compose down
 
   build-and-push:
-    needs: test
+    needs: [dependency-scan, test]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     
@@ -99,6 +210,26 @@ jobs:
         cd phishing_detector/backend
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:${{ steps.version.outputs.version }} .
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest .
+        
+        # Install Trivy for built image scanning
+        sudo apt-get update
+        sudo apt-get install wget apt-transport-https gnupg lsb-release
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+        echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update
+        sudo apt-get install trivy
+        
+        echo "🔍 Scanning built backend image for vulnerabilities..."
+        trivy image --severity HIGH,CRITICAL --format json --output backend-built-scan.json ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest || true
+        trivy image --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest
+        
+        # Check if any HIGH/CRITICAL vulnerabilities found in built image
+        if trivy image --severity HIGH,CRITICAL --format json ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest | jq -e '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")' > /dev/null 2>&1; then
+          echo "❌ HIGH/CRITICAL vulnerabilities found in built backend image!"
+          exit 1
+        fi
+        
+        echo "✅ Backend image security scan passed - pushing to Docker Hub"
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:${{ steps.version.outputs.version }}
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest
         echo "success=true" >> $GITHUB_OUTPUT
@@ -109,6 +240,18 @@ jobs:
         cd phishing_detector/frontend
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }} .
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest .
+        
+        echo "🔍 Scanning built frontend image for vulnerabilities..."
+        trivy image --severity HIGH,CRITICAL --format json --output frontend-built-scan.json ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest || true
+        trivy image --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest
+        
+        # Check if any HIGH/CRITICAL vulnerabilities found in built image
+        if trivy image --severity HIGH,CRITICAL --format json ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest | jq -e '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")' > /dev/null 2>&1; then
+          echo "❌ HIGH/CRITICAL vulnerabilities found in built frontend image!"
+          exit 1
+        fi
+        
+        echo "✅ Frontend image security scan passed - pushing to Docker Hub"
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }}
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest
         echo "success=true" >> $GITHUB_OUTPUT

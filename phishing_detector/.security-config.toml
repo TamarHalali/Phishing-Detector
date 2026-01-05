@@ -1,0 +1,35 @@
+# Security Configuration for Dependency Scanning
+
+## Python Dependencies Security
+# pip-audit configuration
+[tool.pip-audit]
+desc = "Audit Python packages for known vulnerabilities"
+format = "json"
+output = "pip-audit-results.json"
+
+# Safety configuration  
+[tool.safety]
+ignore = []  # Add CVE IDs to ignore if needed
+output = "json"
+
+## Node.js Dependencies Security
+# npm audit configuration
+audit-level = "high"
+fund = false
+
+## Docker Security
+# Trivy scanner configuration
+[trivy]
+severity = ["HIGH", "CRITICAL"]
+format = "json"
+
+## Allowed Vulnerability Exceptions
+# Add specific CVEs here that are accepted risks
+exceptions = [
+    # Example: "CVE-2023-12345"  # Reason for exception
+]
+
+## Security Policies
+fail_on_high = true
+fail_on_critical = true
+auto_fix = false  # Manual review required

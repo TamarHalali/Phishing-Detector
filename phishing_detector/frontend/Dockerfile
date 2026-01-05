@@ -1,13 +1,21 @@
-FROM node:18-alpine as build
+FROM node:18.19.0-alpine as build
 
 WORKDIR /app
+
+# Install security updates
+RUN apk update && apk upgrade && rm -rf /var/cache/apk/*
+
 COPY package*.json ./
-RUN npm install
+RUN npm ci --only=production
 
 COPY . .
 RUN npm run build
 
-FROM nginx:alpine
+FROM nginx:1.25.3-alpine
+
+# Install security updates
+RUN apk update && apk upgrade && rm -rf /var/cache/apk/*
+
 COPY --from=build /app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
 
