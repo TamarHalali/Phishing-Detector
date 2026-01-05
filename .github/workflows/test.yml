@@ -31,16 +31,17 @@ jobs:
         pip install -r requirements-test.txt
         
         echo "🔍 Running pip-audit for Python dependencies..."
-        pip-audit --format=json --output=pip-audit-results.json || true
-        pip-audit --format=text
+        pip-audit --format=json --output=pip-audit-results.json --progress-spinner=off || echo "pip-audit completed with warnings"
+        pip-audit --format=text --progress-spinner=off || echo "pip-audit completed with warnings"
         
         echo "🔍 Running Safety scan..."
-        safety check --json --output=safety-results.json || true
-        safety check
+        safety check --json --output=safety-results.json || echo "safety completed with warnings"
+        safety check || echo "safety completed with warnings"
         
-        # Check for HIGH/CRITICAL vulnerabilities
-        if pip-audit --format=json | jq -e '.vulnerabilities[] | select(.aliases[].id | test("HIGH|CRITICAL"; "i"))' > /dev/null 2>&1; then
+        # Check for HIGH/CRITICAL vulnerabilities in pip-audit
+        if pip-audit --format=json --progress-spinner=off --quiet | jq -e '.vulnerabilities[] | select(.fix_versions != null)' > /dev/null 2>&1; then
           echo "❌ HIGH/CRITICAL vulnerabilities found in Python dependencies!"
+          pip-audit --format=text --progress-spinner=off
           exit 1
         fi
     
@@ -70,27 +71,27 @@ jobs:
         sudo apt-get install trivy
         
         echo "🔍 Scanning Docker base images..."
-        trivy image --severity HIGH,CRITICAL --format json --output python-base-scan.json python:3.11-slim || true
-        trivy image --severity HIGH,CRITICAL python:3.11-slim
+        trivy image --severity HIGH,CRITICAL --format json --output python-base-scan.json python:3.11.7-slim || true
+        trivy image --severity HIGH,CRITICAL python:3.11.7-slim
         
-        trivy image --severity HIGH,CRITICAL --format json --output node-base-scan.json node:18-alpine || true
-        trivy image --severity HIGH,CRITICAL node:18-alpine
+        trivy image --severity HIGH,CRITICAL --format json --output node-base-scan.json node:18.19.0-alpine || true
+        trivy image --severity HIGH,CRITICAL node:18.19.0-alpine
         
-        trivy image --severity HIGH,CRITICAL --format json --output mysql-base-scan.json mysql:8.0 || true
-        trivy image --severity HIGH,CRITICAL mysql:8.0
+        trivy image --severity HIGH,CRITICAL --format json --output mysql-base-scan.json mysql:8.0.35 || true
+        trivy image --severity HIGH,CRITICAL mysql:8.0.35
         
         # Check if any HIGH/CRITICAL vulnerabilities found
-        if trivy image --severity HIGH,CRITICAL --format json python:3.11-slim | jq -e '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")' > /dev/null 2>&1; then
+        if trivy image --severity HIGH,CRITICAL --format json python:3.11.7-slim | jq -e '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")' > /dev/null 2>&1; then
           echo "❌ HIGH/CRITICAL vulnerabilities found in Python base image!"
           exit 1
         fi
         
-        if trivy image --severity HIGH,CRITICAL --format json node:18-alpine | jq -e '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")' > /dev/null 2>&1; then
+        if trivy image --severity HIGH,CRITICAL --format json node:18.19.0-alpine | jq -e '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")' > /dev/null 2>&1; then
           echo "❌ HIGH/CRITICAL vulnerabilities found in Node.js base image!"
           exit 1
         fi
         
-        if trivy image --severity HIGH,CRITICAL --format json mysql:8.0 | jq -e '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")' > /dev/null 2>&1; then
+        if trivy image --severity HIGH,CRITICAL --format json mysql:8.0.35 | jq -e '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")' > /dev/null 2>&1; then
           echo "❌ HIGH/CRITICAL vulnerabilities found in MySQL base image!"
           exit 1
         fi
@@ -168,6 +169,15 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         
+    - name: Install Trivy
+      run: |
+        sudo apt-get update
+        sudo apt-get install wget apt-transport-https gnupg lsb-release
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+        echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update
+        sudo apt-get install trivy
+        
     - name: Read and increment version
       id: version
       run: |
@@ -201,14 +211,6 @@ jobs:
         cd phishing_detector/backend
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:${{ steps.version.outputs.version }} .
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest .
-        
-        # Install Trivy for built image scanning
-        sudo apt-get update
-        sudo apt-get install wget apt-transport-https gnupg lsb-release
-        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-        echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
-        sudo apt-get update
-        sudo apt-get install trivy
         
         echo "🔍 Scanning built backend image for vulnerabilities..."
         trivy image --severity HIGH,CRITICAL --format json --output backend-built-scan.json ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest || true

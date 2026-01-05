@@ -6,7 +6,7 @@ WORKDIR /app
 RUN apk update && apk upgrade && rm -rf /var/cache/apk/*
 
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 COPY . .
 RUN npm run build
