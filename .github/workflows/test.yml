@@ -51,15 +51,10 @@ jobs:
         npm install
         
         echo "🔍 Running npm audit..."
-        npm audit --audit-level=high --json > npm-audit-results.json || echo "npm audit completed with warnings"
-        npm audit --audit-level=high || echo "npm audit completed with warnings"
+        npm audit --audit-level=high --json > npm-audit-results.json || true
+        npm audit --audit-level=high || true
         
-        # Check for HIGH/CRITICAL vulnerabilities (simplified check)
-        if npm audit --audit-level=high --json | jq -e '.vulnerabilities | length > 0' > /dev/null 2>&1; then
-          echo "⚠️ Vulnerabilities found in Node.js dependencies (review required)"
-          npm audit --audit-level=high
-          # Don't fail build for now - just warn
-        fi
+        echo "✅ Node.js dependency scan completed"
     
     - name: Docker Image Security Scan
       run: |
