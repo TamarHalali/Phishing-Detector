@@ -107,15 +107,6 @@ jobs:
           python-base-scan.json
           node-base-scan.json
           mysql-base-scan.json
-    
-    - name: Upload built images scan results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: built-images-scan-results
-        path: |
-          backend-built-scan.json
-          frontend-built-scan.json
 
   test:
     needs: dependency-scan
@@ -255,6 +246,15 @@ jobs:
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }}
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest
         echo "success=true" >> $GITHUB_OUTPUT
+    
+    - name: Upload built images scan results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: built-images-scan-results
+        path: |
+          backend-built-scan.json
+          frontend-built-scan.json
     
 
     - name: Update GitHub Variable
