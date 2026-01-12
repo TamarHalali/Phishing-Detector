@@ -266,16 +266,42 @@ jobs:
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     
     steps:
+    - name: Check system status
+      run: |
+        echo "🚀 Starting deployment to EC2..."
+        echo "📍 Current directory: $(pwd)"
+        echo "👤 Current user: $(whoami)"
+        echo "🖥️  Hostname: $(hostname)"
+        echo "📅 Date: $(date)"
+        echo ""
+        echo "🔍 Checking Docker installation..."
+        docker --version || echo "❌ Docker not found!"
+        docker-compose --version || echo "❌ Docker Compose not found!"
+        echo ""
+        echo "🔍 Checking running containers..."
+        docker ps -a || echo "⚠️  Could not list containers"
+        echo ""
+        echo "🔍 Checking Docker images..."
+        docker images | head -10 || echo "⚠️  Could not list images"
+    
     - name: Login to Docker Hub
-      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+      run: |
+        echo "🔐 Logging in to Docker Hub..."
+        echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+        echo "✅ Docker Hub login successful"
     
     - name: Stop existing containers
       run: |
-        docker-compose down || true
-        docker system prune -f
+        echo "🛑 Stopping existing containers..."
+        docker-compose down || echo "⚠️  No existing docker-compose to stop"
+        docker-compose -f docker-compose.prod.yml down || echo "⚠️  No existing docker-compose.prod.yml to stop"
+        echo "🧹 Cleaning up Docker system..."
+        docker system prune -f || echo "⚠️  Docker prune failed"
+        echo "✅ Cleanup completed"
     
     - name: Create docker-compose.yml for production
       run: |
+        echo "📝 Creating docker-compose.prod.yml..."
         cat > docker-compose.prod.yml << 'EOF'
         version: '3.8'
         
@@ -362,9 +388,13 @@ jobs:
         volumes:
           mysql_data:
         EOF
+        echo "✅ docker-compose.prod.yml created"
+        echo "📄 File contents preview:"
+        head -20 docker-compose.prod.yml
     
     - name: Create nginx config for HTTP
       run: |
+        echo "📝 Creating nginx-prod.conf..."
         cat > nginx-prod.conf << 'EOF'
         events {
             worker_connections 1024;
@@ -397,13 +427,31 @@ jobs:
             }
         }
         EOF
+        echo "✅ nginx-prod.conf created"
+        echo "📄 File contents preview:"
+        head -15 nginx-prod.conf
     
     - name: Pull latest images
       run: |
-        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest
-        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest
-        docker pull mysql:8.0.35
-        docker pull nginx:alpine
+        echo "📥 Pulling latest Docker images..."
+        echo "🐳 Pulling backend image..."
+        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest || { echo "❌ Failed to pull backend image"; exit 1; }
+        echo "✅ Backend image pulled"
+        
+        echo "🐳 Pulling frontend image..."
+        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest || { echo "❌ Failed to pull frontend image"; exit 1; }
+        echo "✅ Frontend image pulled"
+        
+        echo "🐳 Pulling MySQL image..."
+        docker pull mysql:8.0.35 || { echo "❌ Failed to pull MySQL image"; exit 1; }
+        echo "✅ MySQL image pulled"
+        
+        echo "🐳 Pulling Nginx image..."
+        docker pull nginx:alpine || { echo "❌ Failed to pull Nginx image"; exit 1; }
+        echo "✅ Nginx image pulled"
+        
+        echo "📦 All images pulled successfully"
+        docker images | grep -E "(phishing-detector|mysql|nginx)" || echo "⚠️  Could not verify images"
     
     - name: Start services with docker-compose
       env:
@@ -412,29 +460,105 @@ jobs:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
       run: |
+        echo "🚀 Starting services with docker-compose..."
+        echo "📋 Using docker-compose.prod.yml"
         docker-compose -f docker-compose.prod.yml up -d
+        echo "⏳ Waiting 5 seconds for services to initialize..."
+        sleep 5
+        echo "🔍 Checking container status..."
+        docker-compose -f docker-compose.prod.yml ps || docker ps
     
     - name: Wait for services
       run: |
         echo "⏳ Waiting for services to start..."
+        echo "📊 Current container status:"
+        docker-compose -f docker-compose.prod.yml ps || docker ps
+        
+        echo ""
+        echo "⏳ Waiting 30 seconds for services to initialize..."
         sleep 30
         
+        echo ""
         echo "🔍 Checking MySQL health..."
-        docker-compose -f docker-compose.prod.yml exec -T mysql mysqladmin ping -h localhost --silent
+        MAX_RETRIES=10
+        RETRY_COUNT=0
+        while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+          if docker-compose -f docker-compose.prod.yml exec -T mysql mysqladmin ping -h localhost --silent 2>/dev/null; then
+            echo "✅ MySQL is healthy!"
+            break
+          else
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            echo "⏳ MySQL not ready yet... ($RETRY_COUNT/$MAX_RETRIES)"
+            sleep 5
+          fi
+        done
         
+        if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+          echo "❌ MySQL health check failed after $MAX_RETRIES attempts"
+          echo "📋 MySQL logs:"
+          docker-compose -f docker-compose.prod.yml logs mysql | tail -20
+        fi
+        
+        echo ""
         echo "🔍 Checking backend services..."
         for i in {1..3}; do
-          docker-compose -f docker-compose.prod.yml logs backend$i | tail -5
+          echo "📋 Backend$i logs (last 10 lines):"
+          docker-compose -f docker-compose.prod.yml logs backend$i | tail -10 || echo "⚠️  Could not get logs for backend$i"
+          echo ""
         done
+        
+        echo "🔍 Checking frontend service..."
+        docker-compose -f docker-compose.prod.yml logs frontend | tail -10 || echo "⚠️  Could not get logs for frontend"
+        
+        echo "🔍 Checking nginx service..."
+        docker-compose -f docker-compose.prod.yml logs nginx | tail -10 || echo "⚠️  Could not get logs for nginx"
+        
+        echo ""
+        echo "📊 Final container status:"
+        docker-compose -f docker-compose.prod.yml ps || docker ps
     
     - name: Verify HTTP deployment
       run: |
+        echo "⏳ Waiting additional 10 seconds for all services..."
         sleep 10
-        echo "🚀 Deployment completed!"
-        echo "✅ Services available at:"
-        echo "   - Frontend: http://$(curl -s ifconfig.me)/"
-        echo "   - API: http://$(curl -s ifconfig.me)/api/"
         
-        # Test local connectivity
-        curl -f http://localhost/ || echo "⚠️  HTTP check failed"
+        echo ""
+        echo "🔍 Checking port 80..."
+        netstat -tuln | grep :80 || ss -tuln | grep :80 || echo "⚠️  Could not check port 80"
+        
+        echo ""
+        echo "🔍 Testing local HTTP connectivity..."
+        if curl -f -s http://localhost/ > /dev/null; then
+          echo "✅ Frontend is responding on http://localhost/"
+        else
+          echo "⚠️  Frontend check failed on http://localhost/"
+          echo "📋 Nginx logs:"
+          docker-compose -f docker-compose.prod.yml logs nginx | tail -20
+        fi
+        
+        if curl -f -s http://localhost/api/health > /dev/null 2>&1 || curl -f -s http://localhost/api/ > /dev/null 2>&1; then
+          echo "✅ API is responding on http://localhost/api/"
+        else
+          echo "⚠️  API check failed on http://localhost/api/"
+          echo "📋 Backend logs:"
+          docker-compose -f docker-compose.prod.yml logs backend1 | tail -20
+        fi
+        
+        echo ""
+        echo "🌐 Getting public IP address..."
+        PUBLIC_IP=$(curl -s ifconfig.me || curl -s ipinfo.io/ip || echo "Could not determine")
+        echo "📍 Public IP: $PUBLIC_IP"
+        
+        echo ""
+        echo "🚀 Deployment completed!"
+        echo "✅ Services should be available at:"
+        echo "   - Frontend: http://$PUBLIC_IP/"
+        echo "   - API: http://$PUBLIC_IP/api/"
+        echo ""
+        echo "📊 Final container status:"
+        docker-compose -f docker-compose.prod.yml ps || docker ps
+        echo ""
+        echo "🔍 Docker network info:"
+        docker network ls
+        docker network inspect $(docker-compose -f docker-compose.prod.yml ps -q | head -1 | xargs docker inspect --format='{{range .NetworkSettings.Networks}}{{.NetworkID}}{{end}}' 2>/dev/null) 2>/dev/null || echo "⚠️  Could not inspect network"
     
