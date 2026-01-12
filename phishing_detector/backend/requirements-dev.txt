@@ -1,0 +1,12 @@
+# Development and testing dependencies
+# These are used for security scanning and development tools
+# They should NOT be installed in production Docker images
+
+# Security scanning tools
+pip-audit>=2.6.0
+safety>=2.3.0
+
+# Note: jq is a system package (installed via apt), not a Python package
+#       It's used in the workflow for JSON processing but doesn't need to be in requirements
+# Note: trivy is a system package installed via apt, not pip
+# Note: npm audit is built into npm, no separate package needed
