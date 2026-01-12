@@ -259,4 +259,182 @@ jobs:
             "draft": false,
             "prerelease": false
           }' || echo "Release might already exist, continuing..."
+
+  deploy-to-ec2:
+    needs: [build-and-push]
+    runs-on: ip-172-31-33-250
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: Login to Docker Hub
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+    
+    - name: Stop existing containers
+      run: |
+        docker-compose down || true
+        docker system prune -f
+    
+    - name: Create docker-compose.yml for production
+      run: |
+        cat > docker-compose.prod.yml << 'EOF'
+        version: '3.8'
+        
+        services:
+          mysql:
+            image: mysql:8.0.35
+            container_name: phishing-mysql
+            environment:
+              MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+              MYSQL_DATABASE: phishing_db
+              MYSQL_USER: phishing_user
+              MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+            volumes:
+              - mysql_data:/var/lib/mysql
+            restart: unless-stopped
+            healthcheck:
+              test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+              interval: 30s
+              timeout: 10s
+              retries: 5
+              start_period: 60s
+        
+          backend1:
+            image: ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest
+            environment:
+              - FLASK_ENV=production
+              - DATABASE_URL=mysql+pymysql://phishing_user:${{ secrets.MYSQL_PASSWORD }}@mysql:3306/phishing_db
+              - GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+              - VIRUSTOTAL_API_KEY=${{ secrets.VIRUSTOTAL_API_KEY }}
+              - MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+            depends_on:
+              mysql:
+                condition: service_healthy
+            restart: unless-stopped
+        
+          backend2:
+            image: ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest
+            environment:
+              - FLASK_ENV=production
+              - DATABASE_URL=mysql+pymysql://phishing_user:${{ secrets.MYSQL_PASSWORD }}@mysql:3306/phishing_db
+              - GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+              - VIRUSTOTAL_API_KEY=${{ secrets.VIRUSTOTAL_API_KEY }}
+              - MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+            depends_on:
+              mysql:
+                condition: service_healthy
+            restart: unless-stopped
+        
+          backend3:
+            image: ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest
+            environment:
+              - FLASK_ENV=production
+              - DATABASE_URL=mysql+pymysql://phishing_user:${{ secrets.MYSQL_PASSWORD }}@mysql:3306/phishing_db
+              - GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+              - VIRUSTOTAL_API_KEY=${{ secrets.VIRUSTOTAL_API_KEY }}
+              - MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+            depends_on:
+              mysql:
+                condition: service_healthy
+            restart: unless-stopped
+        
+          frontend:
+            image: ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest
+            container_name: phishing-frontend
+            depends_on:
+              backend1:
+                condition: service_started
+            restart: unless-stopped
+        
+          nginx:
+            image: nginx:alpine
+            container_name: phishing-nginx
+            ports:
+              - "80:80"
+            volumes:
+              - ./nginx-prod.conf:/etc/nginx/nginx.conf:ro
+            depends_on:
+              - frontend
+              - backend1
+              - backend2
+              - backend3
+            restart: unless-stopped
+        
+        volumes:
+          mysql_data:
+        EOF
+    
+    - name: Create nginx config for HTTP
+      run: |
+        cat > nginx-prod.conf << 'EOF'
+        events {
+            worker_connections 1024;
+        }
+        
+        http {
+            upstream backend {
+                server backend1:5000;
+                server backend2:5000;
+                server backend3:5000;
+            }
+            
+            server {
+                listen 80;
+                server_name _;
+                
+                location /api/ {
+                    proxy_pass http://backend;
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                }
+                
+                location / {
+                    proxy_pass http://frontend:80;
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                }
+            }
+        }
+        EOF
+    
+    - name: Pull latest images
+      run: |
+        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest
+        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest
+        docker pull mysql:8.0.35
+        docker pull nginx:alpine
+    
+    - name: Start services with docker-compose
+      env:
+        MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+        MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
+      run: |
+        docker-compose -f docker-compose.prod.yml up -d
+    
+    - name: Wait for services
+      run: |
+        echo "⏳ Waiting for services to start..."
+        sleep 30
+        
+        echo "🔍 Checking MySQL health..."
+        docker-compose -f docker-compose.prod.yml exec -T mysql mysqladmin ping -h localhost --silent
+        
+        echo "🔍 Checking backend services..."
+        for i in {1..3}; do
+          docker-compose -f docker-compose.prod.yml logs backend$i | tail -5
+        done
+    
+    - name: Verify HTTP deployment
+      run: |
+        sleep 10
+        echo "🚀 Deployment completed!"
+        echo "✅ Services available at:"
+        echo "   - Frontend: http://$(curl -s ifconfig.me)/"
+        echo "   - API: http://$(curl -s ifconfig.me)/api/"
+        
+        # Test local connectivity
+        curl -f http://localhost/ || echo "⚠️  HTTP check failed"
     
