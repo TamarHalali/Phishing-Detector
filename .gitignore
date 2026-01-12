@@ -4,3 +4,33 @@ node_modules/
 __pycache__/
 *.pyc
 .DS_Store
+
+# Python virtual environment
+venv/
+env/
+ENV/
+.venv
+
+# Test/demo email files
+*.eml
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Build artifacts
+build/
+dist/
+*.egg-info/

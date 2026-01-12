@@ -17,7 +17,8 @@ FROM nginx:1.25.3-alpine
 RUN apk update && apk upgrade && rm -rf /var/cache/apk/*
 
 COPY --from=build /app/build /usr/share/nginx/html
-COPY ../nginx.conf /etc/nginx/nginx.conf
+# Note: nginx.conf is not needed here - nginx:alpine serves static files by default
+# The main nginx service in docker-compose.yml handles routing
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
