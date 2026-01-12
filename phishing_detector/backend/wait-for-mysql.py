@@ -6,13 +6,16 @@ import sys
 def wait_for_mysql():
     max_retries = 30
     retry_count = 0
+    mysql_password = os.getenv('MYSQL_PASSWORD')
+    if not mysql_password:
+        raise ValueError("MYSQL_PASSWORD environment variable is required")
     
     while retry_count < max_retries:
         try:
             connection = pymysql.connect(
                 host='mysql',
                 user='phishing_user',
-                password='phishing_pass',
+                password=mysql_password,
                 database='phishing_db'
             )
             connection.close()

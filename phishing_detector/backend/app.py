@@ -10,12 +10,15 @@ from datetime import datetime
 
 def wait_for_mysql():
     max_retries = 30
+    mysql_password = os.getenv('MYSQL_PASSWORD')
+    if not mysql_password:
+        raise ValueError("MYSQL_PASSWORD environment variable is required")
     for i in range(max_retries):
         try:
             connection = pymysql.connect(
                 host='mysql',
                 user='phishing_user',
-                password='phishing_pass',
+                password=mysql_password,
                 database='phishing_db'
             )
             connection.close()
@@ -33,7 +36,10 @@ if not wait_for_mysql():
 app = Flask(__name__)
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://phishing_user:phishing_pass@mysql:3306/phishing_db'
+mysql_password = os.getenv('MYSQL_PASSWORD')
+if not mysql_password:
+    raise ValueError("MYSQL_PASSWORD environment variable is required")
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://phishing_user:{mysql_password}@mysql:3306/phishing_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)

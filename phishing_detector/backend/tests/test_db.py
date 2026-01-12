@@ -7,8 +7,10 @@ from models.database import EmailAnalysis
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
-    # Use real database URL from environment or default to test database
-    test_db_url = os.getenv('DATABASE_URL', 'mysql+pymysql://phishing_user:phishing_pass@mysql:3306/phishing_db')
+    # Use real database URL from environment
+    test_db_url = os.getenv('DATABASE_URL')
+    if not test_db_url:
+        raise ValueError("DATABASE_URL environment variable is required for testing")
     app.config['SQLALCHEMY_DATABASE_URI'] = test_db_url
     
     with app.test_client() as client:

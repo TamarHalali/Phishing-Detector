@@ -4,17 +4,13 @@ import os
 
 class LLMAnalyzer:
     def __init__(self):
-        self.gemini_api_key = os.getenv('GEMINI_API_KEY', 'demo_key')
-        self.openai_api_key = os.getenv('OPENAI_API_KEY', 'demo_key')
+        self.gemini_api_key = os.getenv('GEMINI_API_KEY')
+        if not self.gemini_api_key:
+            raise ValueError("GEMINI_API_KEY environment variable is required")
     
     def analyze_email_with_llm(self, email_data):
-        """Analyze email using LLM (Gemini or OpenAI)"""
-        if self.gemini_api_key != 'demo_key':
-            return self._analyze_with_gemini(email_data)
-        elif self.openai_api_key != 'demo_key':
-            return self._analyze_with_openai(email_data)
-        else:
-            return self._mock_llm_analysis(email_data)
+        """Analyze email using LLM (Gemini)"""
+        return self._analyze_with_gemini(email_data)
     
     def _analyze_with_gemini(self, email_data):
         """Analyze with Google Gemini API"""
@@ -49,42 +45,7 @@ class LLMAnalyzer:
         except:
             return self._mock_llm_analysis(email_data)
     
-    def _analyze_with_openai(self, email_data):
-        """Analyze with OpenAI GPT API"""
-        url = "https://api.openai.com/v1/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {self.openai_api_key}",
-            "Content-Type": "application/json"
-        }
-        
-        prompt = f"""
-        Analyze this email for phishing indicators and provide a risk score (0-100) and summary:
-        
-        From: {email_data['sender']}
-        Subject: {email_data['subject']}
-        Body: {email_data['body'][:1000]}
-        URLs: {', '.join(email_data['urls'])}
-        
-        Respond in JSON format only:
-        {{"score": <number>, "summary": "<explanation>", "indicators": ["<list of specific indicators found>"]}}
-        """
-        
-        payload = {
-            "model": "gpt-3.5-turbo",
-            "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": 500
-        }
-        
-        try:
-            response = requests.post(url, headers=headers, json=payload, timeout=10)
-            if response.status_code == 200:
-                result = response.json()
-                text = result['choices'][0]['message']['content']
-                return json.loads(text.strip('```json\n').strip('```'))
-            else:
-                return self._mock_llm_analysis(email_data)
-        except:
-            return self._mock_llm_analysis(email_data)
+
     
     def _mock_llm_analysis(self, email_data):
         """Mock LLM analysis for demo"""
