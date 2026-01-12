@@ -8,7 +8,7 @@ on:
 
 jobs:
   dependency-scan:
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: [ubuntu-latest, Linux, X64]
     steps:
     - uses: actions/checkout@v4
     
@@ -93,7 +93,7 @@ jobs:
 
   test:
     needs: dependency-scan
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: [ubuntu-latest, Linux, X64]
     
 
 
@@ -147,7 +147,7 @@ jobs:
 
   build-and-push:
     needs: [dependency-scan, test]
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: [ubuntu-latest, Linux, X64]
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     
     steps:
