@@ -65,7 +65,7 @@ jobs:
         # Parse JSON results and create summary
         if [ -f pip-audit-results.json ]; then
           echo "### Critical/High Vulnerabilities Found:" >> vulnerability-report.md
-          python3 << 'PYTHON_SCRIPT'
+          python3 << 'PYTHON_END'
 import json
 import os
 
@@ -100,7 +100,7 @@ try:
             print("---")
 except Exception as e:
     print(f"Error parsing pip-audit results: {e}")
-PYTHON_SCRIPT
+PYTHON_END
         fi >> vulnerability-report.md
         
         # Check for HIGH/CRITICAL vulnerabilities and attempt fixes
