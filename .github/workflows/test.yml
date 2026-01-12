@@ -41,15 +41,8 @@ jobs:
         echo "🔍 Running pip-audit for Python dependencies..."
         pip-audit --format=json --output=pip-audit-results.json --progress-spinner=off || echo "⚠️ pip-audit completed with warnings"
         
-        echo "📄 Formatted pip-audit results:"
-        cat pip-audit-results.json | jq '.' || cat pip-audit-results.json
-        
-        echo ""
         echo "🔍 Running Safety scan..."
         safety check --json --output=safety-results.json || echo "⚠️ safety completed with warnings"
-        
-        echo "📄 Formatted Safety results:"
-        cat safety-results.json | jq '.' || cat safety-results.json
         
         echo ""
         echo "🔧 Attempting to fix vulnerabilities with available updates..."
@@ -88,10 +81,6 @@ jobs:
         echo "🔍 Running npm audit..."
         npm audit --audit-level=high --json > npm-audit-results.json || true
         
-        echo "📄 Formatted npm audit results:"
-        cat npm-audit-results.json | jq '.' || cat npm-audit-results.json
-        
-        echo ""
         echo "🔧 Attempting to fix vulnerabilities..."
         npm audit fix --audit-level=high || echo "⚠️ Some vulnerabilities could not be automatically fixed"
         
@@ -115,21 +104,13 @@ jobs:
         echo "🔍 Scanning Docker base images..."
         
         echo "🐍 Scanning Python base image..."
-        trivy image --severity HIGH,CRITICAL --format json --output python-base-scan.json python:3.11.7-slim || true
-        echo "📄 Python image scan results:"
-        cat python-base-scan.json | jq '.' || cat python-base-scan.json
+        trivy image --severity HIGH,CRITICAL --format json --output python-base-scan.json python:3.11.7-slim --quiet || true
         
-        echo ""
         echo "📦 Scanning Node.js base image..."
-        trivy image --severity HIGH,CRITICAL --format json --output node-base-scan.json node:18.19.0-alpine || true
-        echo "📄 Node.js image scan results:"
-        cat node-base-scan.json | jq '.' || cat node-base-scan.json
+        trivy image --severity HIGH,CRITICAL --format json --output node-base-scan.json node:18.19.0-alpine --quiet || true
         
-        echo ""
         echo "🗄️ Scanning MySQL base image..."
-        trivy image --severity HIGH,CRITICAL --format json --output mysql-base-scan.json mysql:8.0.35 || true
-        echo "📄 MySQL image scan results:"
-        cat mysql-base-scan.json | jq '.' || cat mysql-base-scan.json
+        trivy image --severity HIGH,CRITICAL --format json --output mysql-base-scan.json mysql:8.0.35 --quiet || true
         
         echo ""
         echo "✅ Docker base image security scan completed"
@@ -150,18 +131,9 @@ jobs:
         
         echo ""
         if [ -f SECURITY_SCAN_REPORT.md ]; then
-          echo "📄 Security Report Preview (first 100 lines):"
-          head -100 SECURITY_SCAN_REPORT.md
+          echo "📄 Security report generated successfully"
         else
           echo "⚠️ Security report file not found"
-        fi
-        
-        echo ""
-        if [ -f security-scan-summary.json ]; then
-          echo "📊 Summary JSON:"
-          cat security-scan-summary.json | jq '.' || cat security-scan-summary.json
-        else
-          echo "⚠️ Summary JSON file not found"
         fi
     
     - name: Upload scan results
@@ -230,7 +202,7 @@ jobs:
         MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
       run: |
         cd phishing_detector
-        timeout 120 bash -c 'until docker-compose exec -T mysql mysqladmin ping -h localhost --silent; do sleep 2; done'
+        timeout 60 bash -c 'until docker-compose exec -T mysql mysqladmin ping -h localhost --silent; do sleep 1; done'
     
     - name: Run Tests
       env:
@@ -302,12 +274,10 @@ jobs:
       id: backend_build
       run: |
         cd phishing_detector/backend
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:${{ steps.version.outputs.version }} .
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest .
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:${{ steps.version.outputs.version }} -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest .
         
         echo "🔍 Scanning built backend image for vulnerabilities..."
-        trivy image --severity HIGH,CRITICAL --format json --output backend-built-scan.json ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest || true
-        trivy image --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest || true
+        trivy image --severity HIGH,CRITICAL --format json --output backend-built-scan.json ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest --quiet || true
         
         echo "✅ Backend image security scan completed - pushing to Docker Hub"
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:${{ steps.version.outputs.version }}
@@ -318,12 +288,10 @@ jobs:
       id: frontend_build
       run: |
         cd phishing_detector/frontend
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }} .
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest .
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }} -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest .
         
         echo "🔍 Scanning built frontend image for vulnerabilities..."
-        trivy image --severity HIGH,CRITICAL --format json --output frontend-built-scan.json ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest || true
-        trivy image --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest || true
+        trivy image --severity HIGH,CRITICAL --format json --output frontend-built-scan.json ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest --quiet || true
         
         echo "✅ Frontend image security scan completed - pushing to Docker Hub"
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }}
@@ -435,10 +403,10 @@ jobs:
             restart: unless-stopped
             healthcheck:
               test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-              interval: 30s
-              timeout: 10s
-              retries: 5
-              start_period: 60s
+              interval: 10s
+              timeout: 5s
+              retries: 3
+              start_period: 30s
         
           backend1:
             image: ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
@@ -553,8 +521,6 @@ jobs:
         echo "🚀 Starting services with docker-compose..."
         echo "📋 Using docker-compose.prod.yml"
         docker-compose -f docker-compose.prod.yml up -d
-        echo "⏳ Waiting 5 seconds for services to initialize..."
-        sleep 5
         echo "🔍 Checking container status..."
         docker-compose -f docker-compose.prod.yml ps || docker ps
     
@@ -565,12 +531,8 @@ jobs:
         docker-compose -f docker-compose.prod.yml ps || docker ps
         
         echo ""
-        echo "⏳ Waiting 30 seconds for services to initialize..."
-        sleep 30
-        
-        echo ""
         echo "🔍 Checking MySQL health..."
-        MAX_RETRIES=10
+        MAX_RETRIES=8
         RETRY_COUNT=0
         while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
           if docker-compose -f docker-compose.prod.yml exec -T mysql mysqladmin ping -h localhost --silent 2>/dev/null; then
@@ -579,7 +541,7 @@ jobs:
           else
             RETRY_COUNT=$((RETRY_COUNT + 1))
             echo "⏳ MySQL not ready yet... ($RETRY_COUNT/$MAX_RETRIES)"
-            sleep 5
+            sleep 3
           fi
         done
         
@@ -592,16 +554,9 @@ jobs:
         echo ""
         echo "🔍 Checking backend services..."
         for i in {1..3}; do
-          echo "📋 Backend$i logs (last 10 lines):"
-          docker-compose -f docker-compose.prod.yml logs backend$i | tail -10 || echo "⚠️  Could not get logs for backend$i"
-          echo ""
+          echo "📋 Backend$i status:"
+          docker-compose -f docker-compose.prod.yml ps backend$i || echo "⚠️  Could not check backend$i"
         done
-        
-        echo "🔍 Checking frontend service..."
-        docker-compose -f docker-compose.prod.yml logs frontend | tail -10 || echo "⚠️  Could not get logs for frontend"
-        
-        echo "🔍 Checking nginx service..."
-        docker-compose -f docker-compose.prod.yml logs nginx | tail -10 || echo "⚠️  Could not get logs for nginx"
         
         echo ""
         echo "📊 Final container status:"
@@ -609,9 +564,6 @@ jobs:
     
     - name: Verify HTTP deployment
       run: |
-        echo "⏳ Waiting additional 10 seconds for all services..."
-        sleep 10
-        
         echo ""
         echo "🔍 Checking port 80..."
         netstat -tuln | grep :80 || ss -tuln | grep :80 || echo "⚠️  Could not check port 80"
