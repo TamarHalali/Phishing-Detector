@@ -32,110 +32,18 @@ jobs:
         
         echo "🔍 Running pip-audit for Python dependencies..."
         pip-audit --format=json --output=pip-audit-results.json --progress-spinner=off || echo "pip-audit completed with warnings"
-        pip-audit --format=text --progress-spinner=off > pip-audit-readable.txt || echo "pip-audit completed with warnings"
+        pip-audit --format=text --progress-spinner=off || echo "pip-audit completed with warnings"
         
         echo "🔍 Running Safety scan..."
         safety check --json --output=safety-results.json || echo "safety completed with warnings"
-        safety check > safety-readable.txt || echo "safety completed with warnings"
+        safety check || echo "safety completed with warnings"
         
-        echo "📋 Creating detailed vulnerability report..."
-        cat > vulnerability-report.md << 'EOF'
-        # Python Dependencies Vulnerability Report
-        
-        ## Summary
-        - **Scan Date:** $(date)
-        - **Tool:** pip-audit + safety
-        - **Total Packages Scanned:** $(pip list | wc -l)
-        
-        ## Detailed Findings
-        
-        ### pip-audit Results:
-        ```
-        $(cat pip-audit-readable.txt)
-        ```
-        
-        ### Safety Results:
-        ```
-        $(cat safety-readable.txt)
-        ```
-        
-        ## Vulnerability Analysis
-        EOF
-        
-        # Parse JSON results and create summary
-        if [ -f pip-audit-results.json ]; then
-          echo "### Critical/High Vulnerabilities Found:" >> vulnerability-report.md
-          python3 << 'PYTHON_END'
-import json
-import os
-
-try:
-    with open('pip-audit-results.json', 'r') as f:
-        data = json.load(f)
-    
-    vulnerabilities = data.get('vulnerabilities', [])
-    
-    if not vulnerabilities:
-        print("✅ No vulnerabilities found by pip-audit")
-    else:
-        for vuln in vulnerabilities:
-            package = vuln.get('package', 'Unknown')
-            version = vuln.get('installed_version', 'Unknown')
-            vuln_id = vuln.get('id', 'Unknown')
-            description = vuln.get('description', 'No description')
-            fix_versions = vuln.get('fix_versions', [])
-            
-            print(f"\n**Package:** {package}")
-            print(f"**Current Version:** {version}")
-            print(f"**Vulnerability ID:** {vuln_id}")
-            print(f"**Description:** {description}")
-            
-            if fix_versions:
-                print(f"**Fix Available:** Yes - Upgrade to {', '.join(fix_versions)}")
-                print(f"**Action:** RECOMMENDED TO UPGRADE")
-            else:
-                print(f"**Fix Available:** No fix available")
-                print(f"**Action:** MONITOR - No immediate fix")
-            
-            print("---")
-except Exception as e:
-    print(f"Error parsing pip-audit results: {e}")
-PYTHON_END
-        fi >> vulnerability-report.md
-        
-        # Check for HIGH/CRITICAL vulnerabilities and attempt fixes
-        echo "🔧 Attempting to fix vulnerabilities..."
+        # Check for HIGH/CRITICAL vulnerabilities in pip-audit
         if pip-audit --format=json --progress-spinner=off --quiet | jq -e '.vulnerabilities[] | select(.fix_versions != null)' > /dev/null 2>&1; then
-          echo "⚠️  HIGH/CRITICAL vulnerabilities found - attempting automatic fixes..."
-          
-          # Extract packages that need upgrading
-          pip-audit --format=json --progress-spinner=off --quiet | jq -r '.vulnerabilities[] | select(.fix_versions != null) | "\(.package)==\(.fix_versions[0])"' > packages_to_upgrade.txt
-          
-          if [ -s packages_to_upgrade.txt ]; then
-            echo "📦 Packages to upgrade:"
-            cat packages_to_upgrade.txt
-            
-            echo "\n## Automatic Fixes Applied" >> vulnerability-report.md
-            while read -r package_version; do
-              echo "Upgrading: $package_version"
-              pip install "$package_version" || echo "Failed to upgrade $package_version"
-              echo "- Upgraded: $package_version" >> vulnerability-report.md
-            done < packages_to_upgrade.txt
-            
-            # Re-run scan after fixes
-            echo "🔍 Re-scanning after fixes..."
-            pip-audit --format=text --progress-spinner=off > pip-audit-after-fix.txt || true
-            echo "\n### Post-Fix Scan Results:" >> vulnerability-report.md
-            echo '```' >> vulnerability-report.md
-            cat pip-audit-after-fix.txt >> vulnerability-report.md
-            echo '```' >> vulnerability-report.md
-          fi
-        else
-          echo "✅ No fixable vulnerabilities found"
-          echo "\n## Status: No Critical Vulnerabilities Requiring Immediate Action" >> vulnerability-report.md
+          echo "❌ HIGH/CRITICAL vulnerabilities found in Python dependencies!"
+          pip-audit --format=text --progress-spinner=off
+          exit 1
         fi
-        
-        echo "📄 Vulnerability report created: vulnerability-report.md"
     
     - name: Install Node.js dependencies and scan
       run: |
@@ -144,96 +52,7 @@ PYTHON_END
         
         echo "🔍 Running npm audit..."
         npm audit --audit-level=high --json > npm-audit-results.json || true
-        npm audit --audit-level=high > npm-audit-readable.txt || true
-        
-        echo "📋 Creating Node.js vulnerability report..."
-        cat > npm-vulnerability-report.md << 'EOF'
-        # Node.js Dependencies Vulnerability Report
-        
-        ## Summary
-        - **Scan Date:** $(date)
-        - **Tool:** npm audit
-        - **Total Packages:** $(npm list --depth=0 2>/dev/null | grep -c "├\|└" || echo "Unknown")
-        
-        ## Detailed Findings
-        
-        ### npm audit Results:
-        ```
-        $(cat npm-audit-readable.txt)
-        ```
-        
-        ## Vulnerability Analysis
-        EOF
-        
-        # Parse npm audit results
-        if [ -f npm-audit-results.json ]; then
-          echo "### Vulnerabilities Summary:" >> npm-vulnerability-report.md
-          node << 'NODE_SCRIPT'
-const fs = require('fs');
-
-try {
-    const data = JSON.parse(fs.readFileSync('npm-audit-results.json', 'utf8'));
-    
-    if (data.vulnerabilities) {
-        const vulns = Object.entries(data.vulnerabilities);
-        
-        if (vulns.length === 0) {
-            console.log("✅ No vulnerabilities found by npm audit");
-        } else {
-            vulns.forEach(([name, vuln]) => {
-                console.log(`\n**Package:** ${name}`);
-                console.log(`**Severity:** ${vuln.severity || 'Unknown'}`);
-                console.log(`**Current Version:** ${vuln.range || 'Unknown'}`);
-                
-                if (vuln.fixAvailable) {
-                    if (typeof vuln.fixAvailable === 'object') {
-                        console.log(`**Fix Available:** Yes - ${vuln.fixAvailable.name}@${vuln.fixAvailable.version}`);
-                        console.log(`**Action:** RECOMMENDED TO RUN: npm update ${vuln.fixAvailable.name}`);
-                    } else {
-                        console.log(`**Fix Available:** Yes`);
-                        console.log(`**Action:** RECOMMENDED TO RUN: npm audit fix`);
-                    }
-                } else {
-                    console.log(`**Fix Available:** No automatic fix available`);
-                    console.log(`**Action:** MANUAL REVIEW REQUIRED`);
-                }
-                
-                if (vuln.via && Array.isArray(vuln.via)) {
-                    vuln.via.forEach(v => {
-                        if (typeof v === 'object' && v.source) {
-                            console.log(`**CVE/Advisory:** ${v.source}`);
-                        }
-                    });
-                }
-                
-                console.log("---");
-            });
-        }
-    } else {
-        console.log("✅ No vulnerabilities found");
-    }
-} catch (error) {
-    console.log(`Error parsing npm audit results: ${error.message}`);
-}
-NODE_SCRIPT
-        fi >> npm-vulnerability-report.md
-        
-        # Attempt automatic fixes
-        echo "🔧 Attempting to fix npm vulnerabilities..."
-        npm audit fix --force > npm-fix-log.txt 2>&1 || true
-        
-        echo "\n## Automatic Fixes Applied" >> npm-vulnerability-report.md
-        echo '```' >> npm-vulnerability-report.md
-        cat npm-fix-log.txt >> npm-vulnerability-report.md
-        echo '```' >> npm-vulnerability-report.md
-        
-        # Re-scan after fixes
-        echo "🔍 Re-scanning after fixes..."
-        npm audit --audit-level=high > npm-audit-after-fix.txt || true
-        echo "\n### Post-Fix Scan Results:" >> npm-vulnerability-report.md
-        echo '```' >> npm-vulnerability-report.md
-        cat npm-audit-after-fix.txt >> npm-vulnerability-report.md
-        echo '```' >> npm-vulnerability-report.md
+        npm audit --audit-level=high || true
         
         echo "✅ Node.js dependency scan completed"
     
@@ -248,101 +67,14 @@ NODE_SCRIPT
         sudo apt-get install trivy
         
         echo "🔍 Scanning Docker base images..."
+        trivy image --severity HIGH,CRITICAL --format json --output python-base-scan.json python:3.11.7-slim || true
+        trivy image --severity HIGH,CRITICAL python:3.11.7-slim || true
         
-        # Create comprehensive Docker security report
-        cat > docker-security-report.md << 'EOF'
-        # Docker Images Security Report
+        trivy image --severity HIGH,CRITICAL --format json --output node-base-scan.json node:18.19.0-alpine || true
+        trivy image --severity HIGH,CRITICAL node:18.19.0-alpine || true
         
-        ## Summary
-        - **Scan Date:** $(date)
-        - **Tool:** Trivy
-        - **Severity Levels:** HIGH, CRITICAL
-        
-        ## Base Images Scanned
-        
-        EOF
-        
-        # Scan each base image with detailed reporting
-        images=("python:3.11.7-slim" "node:18.19.0-alpine" "mysql:8.0.35" "nginx:alpine")
-        
-        for image in "${images[@]}"; do
-          echo "🔍 Scanning $image..."
-          
-          # JSON output for parsing
-          trivy image --severity HIGH,CRITICAL --format json --output "${image//[:/]/_}-scan.json" "$image" || true
-          
-          # Human readable output
-          trivy image --severity HIGH,CRITICAL --format table "$image" > "${image//[:/]/_}-scan.txt" || true
-          
-          echo "\n### $image" >> docker-security-report.md
-          echo '```' >> docker-security-report.md
-          cat "${image//[:/]/_}-scan.txt" >> docker-security-report.md
-          echo '```' >> docker-security-report.md
-          
-          # Parse JSON for detailed analysis
-          if [ -f "${image//[:/]/_}-scan.json" ]; then
-            echo "\n#### Vulnerability Analysis for $image:" >> docker-security-report.md
-            python3 << PYTHON_SCRIPT
-import json
-import sys
-
-try:
-    with open('${image//[:/]/_}-scan.json', 'r') as f:
-        data = json.load(f)
-    
-    results = data.get('Results', [])
-    total_vulns = 0
-    critical_count = 0
-    high_count = 0
-    
-    for result in results:
-        vulnerabilities = result.get('Vulnerabilities', [])
-        total_vulns += len(vulnerabilities)
-        
-        for vuln in vulnerabilities:
-            severity = vuln.get('Severity', 'Unknown')
-            if severity == 'CRITICAL':
-                critical_count += 1
-            elif severity == 'HIGH':
-                high_count += 1
-            
-            vuln_id = vuln.get('VulnerabilityID', 'Unknown')
-            pkg_name = vuln.get('PkgName', 'Unknown')
-            installed_version = vuln.get('InstalledVersion', 'Unknown')
-            fixed_version = vuln.get('FixedVersion', 'Not Available')
-            title = vuln.get('Title', 'No title')
-            
-            print(f"\n**Vulnerability:** {vuln_id}")
-            print(f"**Package:** {pkg_name}")
-            print(f"**Installed Version:** {installed_version}")
-            print(f"**Fixed Version:** {fixed_version}")
-            print(f"**Severity:** {severity}")
-            print(f"**Title:** {title}")
-            
-            if fixed_version != 'Not Available' and fixed_version != '':
-                print(f"**Action:** UPDATE RECOMMENDED - Upgrade to {fixed_version}")
-            else:
-                print(f"**Action:** MONITOR - No fix available yet")
-            
-            print("---")
-    
-    print(f"\n**Summary for ${image}:**")
-    print(f"- Total Vulnerabilities: {total_vulns}")
-    print(f"- Critical: {critical_count}")
-    print(f"- High: {high_count}")
-    
-    if total_vulns == 0:
-        print("✅ No HIGH/CRITICAL vulnerabilities found")
-    elif critical_count > 0:
-        print(f"❌ CRITICAL vulnerabilities found - immediate attention required")
-    else:
-        print(f"⚠️  HIGH vulnerabilities found - review recommended")
-        
-except Exception as e:
-    print(f"Error parsing Trivy results for ${image}: {e}")
-PYTHON_SCRIPT
-          fi >> docker-security-report.md
-        done
+        trivy image --severity HIGH,CRITICAL --format json --output mysql-base-scan.json mysql:8.0.35 || true
+        trivy image --severity HIGH,CRITICAL mysql:8.0.35 || true
         
         echo "✅ Docker base image security scan completed"
     
@@ -354,15 +86,10 @@ PYTHON_SCRIPT
         path: |
           phishing_detector/backend/pip-audit-results.json
           phishing_detector/backend/safety-results.json
-          phishing_detector/backend/vulnerability-report.md
-          phishing_detector/backend/pip-audit-readable.txt
-          phishing_detector/backend/safety-readable.txt
           phishing_detector/frontend/npm-audit-results.json
-          phishing_detector/frontend/npm-vulnerability-report.md
-          phishing_detector/frontend/npm-audit-readable.txt
-          docker-security-report.md
-          *-scan.json
-          *-scan.txt
+          python-base-scan.json
+          node-base-scan.json
+          mysql-base-scan.json
 
   test:
     needs: dependency-scan
