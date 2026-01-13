@@ -274,26 +274,28 @@ jobs:
     - name: Read and increment version
       id: version
       run: |
+        # Get current version from GitHub variable
         CURRENT_VERSION="${{ vars.APP_VERSION }}"
-        echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-        
+        echo "Current APP_VERSION variable: $CURRENT_VERSION"
+
         # If no version set, start with 1.0.0
-        if [ -z "$CURRENT_VERSION" ]; then
+        if [ -z "$CURRENT_VERSION" ] || [ "$CURRENT_VERSION" = "null" ]; then
+          echo "⚠️ APP_VERSION variable not set, starting with 1.0.0"
           NEW_VERSION="1.0.0"
         else
           # Parse semver (major.minor.patch)
           MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
           MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
           PATCH=$(echo $CURRENT_VERSION | cut -d. -f3)
-          
+
           # Auto increment patch version
           NEW_PATCH=$((PATCH + 1))
           NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+          echo "Incrementing from $CURRENT_VERSION to $NEW_VERSION"
         fi
-        
+
         echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
-        echo "Current version: $CURRENT_VERSION"
-        echo "New version: $NEW_VERSION"
+        echo "New version will be: $NEW_VERSION"
     
     - name: Login to Docker Hub
       run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
@@ -388,12 +390,43 @@ jobs:
     - name: Update GitHub Variable
       if: steps.backend_build.outputs.success == 'true' && steps.frontend_build.outputs.success == 'true'
       run: |
-        curl -X PATCH \
+        echo "📝 Updating APP_VERSION variable to: ${{ steps.version.outputs.version }}"
+
+        # Update GitHub repository variable
+        UPDATE_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
+          -X PATCH \
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           https://api.github.com/repos/${{ github.repository }}/actions/variables/APP_VERSION \
-          -d '{"name":"APP_VERSION","value":"${{ steps.version.outputs.version }}"}'
+          -d "{\"name\":\"APP_VERSION\",\"value\":\"${{ steps.version.outputs.version }}\"}")
+
+        HTTP_STATUS=$(echo "$UPDATE_RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)
+        RESPONSE_BODY=$(echo "$UPDATE_RESPONSE" | sed '/HTTP_STATUS:/d')
+
+        if [ "$HTTP_STATUS" = "204" ] || [ "$HTTP_STATUS" = "201" ]; then
+          echo "✅ APP_VERSION variable updated successfully to ${{ steps.version.outputs.version }}"
+        else
+          echo "❌ Failed to update APP_VERSION variable"
+          echo "HTTP Status: $HTTP_STATUS"
+          echo "Response: $RESPONSE_BODY"
+
+          # Try to read current variable to debug
+          echo "🔍 Checking current APP_VERSION variable..."
+          CURRENT_VAR=$(curl -s \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/${{ github.repository }}/actions/variables/APP_VERSION)
+
+          if echo "$CURRENT_VAR" | grep -q "APP_VERSION"; then
+            echo "Current variable value:"
+            echo "$CURRENT_VAR" | jq '.value' 2>/dev/null || echo "$CURRENT_VAR"
+          else
+            echo "❌ APP_VERSION variable does not exist or cannot be read"
+            echo "Response: $CURRENT_VAR"
+          fi
+        fi
     
     - name: Create GitHub Release
       if: steps.backend_build.outputs.success == 'true' && steps.frontend_build.outputs.success == 'true'
@@ -445,6 +478,22 @@ jobs:
 
     - name: Configure and start Docker daemon
       run: |
+        echo "🔧 Checking Docker configuration..."
+
+        # Check if already configured correctly
+        if [ -f /etc/docker/daemon.json ]; then
+          CURRENT_ROOT=$(grep -o '"data-root": *"[^"]*"' /etc/docker/daemon.json 2>/dev/null | cut -d'"' -f4 2>/dev/null)
+          if [ "$CURRENT_ROOT" = "/mnt/data/docker" ]; then
+            echo "✅ Docker already configured to use additional volume"
+            # Just verify daemon is running
+            if docker info >/dev/null 2>&1; then
+              echo "✅ Docker daemon is running"
+              docker info | grep "Docker Root Dir"
+              exit 0
+            fi
+          fi
+        fi
+
         echo "🔧 Configuring Docker to use additional volume..."
 
         # Create daemon.json if it doesn't exist
@@ -458,14 +507,26 @@ jobs:
         echo "🔄 Restarting Docker daemon..."
         sudo systemctl daemon-reload
         sudo systemctl restart docker
-        sleep 5
 
-        # Test Docker connectivity
+        # Wait longer for Docker to be fully ready
+        echo "⏳ Waiting for Docker daemon to be fully operational..."
+        for i in {1..12}; do  # 12 attempts = 60 seconds
+          if docker info >/dev/null 2>&1; then
+            echo "✅ Docker daemon is running (attempt $i)"
+            docker info | grep "Docker Root Dir"
+            break
+          else
+            echo "⏳ Docker daemon not ready yet... (attempt $i/12)"
+            sleep 5
+          fi
+        done
+
+        # Final check
         if docker info >/dev/null 2>&1; then
-          echo "✅ Docker daemon is running"
+          echo "✅ Docker daemon fully operational"
           docker info | grep "Docker Root Dir"
         else
-          echo "❌ Docker daemon failed to start"
+          echo "❌ Docker daemon failed to start after waiting"
           sudo systemctl status docker
           sudo journalctl -u docker --no-pager -n 20
           exit 1
