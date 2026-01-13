@@ -304,16 +304,16 @@ jobs:
         cd phishing_detector/backend
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:${{ steps.version.outputs.version }} .
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest .
-        
+
         echo "🔍 Scanning built backend image for vulnerabilities..."
         trivy image --severity HIGH,CRITICAL --format json --output backend-built-scan.json ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest || true
         trivy image --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest || true
-        
+
         echo "✅ Backend image security scan completed - pushing to Docker Hub"
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:${{ steps.version.outputs.version }}
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest
         echo "success=true" >> $GITHUB_OUTPUT
-    
+
     - name: Build and Push Frontend Image
       id: frontend_build
       run: |
@@ -328,6 +328,22 @@ jobs:
         echo "✅ Frontend image security scan completed - pushing to Docker Hub"
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }}
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest
+        echo "success=true" >> $GITHUB_OUTPUT
+
+    - name: Build and Push Nginx Image
+      id: nginx_build
+      run: |
+        cd phishing_detector
+        docker build -f nginx.Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:${{ steps.version.outputs.version }} .
+        docker build -f nginx.Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest .
+
+        echo "🔍 Scanning built nginx image for vulnerabilities..."
+        trivy image --severity HIGH,CRITICAL --format json --output nginx-built-scan.json ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest || true
+        trivy image --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest || true
+
+        echo "✅ Nginx image security scan completed - pushing to Docker Hub"
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:${{ steps.version.outputs.version }}
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest
         echo "success=true" >> $GITHUB_OUTPUT
 
 
@@ -504,11 +520,9 @@ jobs:
               retries: 5
               start_period: 60s
         
-          backend:
+          backend1:
             image: ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
-            container_name: phishing-backend
-            ports:
-              - "80:80"
+            container_name: phishing-backend1
             environment:
               - FLASK_ENV=production
               - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
@@ -519,12 +533,56 @@ jobs:
               mysql:
                 condition: service_healthy
             restart: unless-stopped
-            healthcheck:
-              test: ["CMD", "curl", "-f", "http://localhost/health"]
-              interval: 30s
-              timeout: 10s
-              retries: 3
-              start_period: 40s
+
+          backend2:
+            image: ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
+            container_name: phishing-backend2
+            environment:
+              - FLASK_ENV=production
+              - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
+              - GEMINI_API_KEY=${GEMINI_API_KEY}
+              - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
+              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+            depends_on:
+              mysql:
+                condition: service_healthy
+            restart: unless-stopped
+
+          backend3:
+            image: ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
+            container_name: phishing-backend3
+            environment:
+              - FLASK_ENV=production
+              - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
+              - GEMINI_API_KEY=${GEMINI_API_KEY}
+              - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
+              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+            depends_on:
+              mysql:
+                condition: service_healthy
+            restart: unless-stopped
+
+          frontend:
+            image: ${DOCKERHUB_USERNAME}/phishing-detector-frontend:latest
+            container_name: phishing-frontend
+            depends_on:
+              backend1:
+                condition: service_started
+            restart: unless-stopped
+
+          nginx:
+            image: ${DOCKERHUB_USERNAME}/phishing-detector-nginx:latest
+            container_name: phishing-nginx
+            ports:
+              - "80:80"
+            volumes:
+              - ./nginx.conf:/etc/nginx/nginx.conf:ro
+            depends_on:
+              - frontend
+              - backend1
+              - backend2
+              - backend3
+            restart: unless-stopped
         
 
         
@@ -566,12 +624,32 @@ jobs:
           exit 1
         fi
 
-        # Pull backend image (now includes nginx and serves everything)
-        if ! pull_if_needed "${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest" "Backend"; then
+        # Pull other images in parallel
+        pull_if_needed "${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest" "Backend" &
+        BACKEND_PID=$!
+
+        pull_if_needed "${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest" "Frontend" &
+        FRONTEND_PID=$!
+
+        pull_if_needed "${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest" "Nginx" &
+        NGINX_PID=$!
+
+        # Wait for remaining pulls
+        echo "⏳ Waiting for remaining images..."
+        BACKEND_OK=0
+        FRONTEND_OK=0
+        NGINX_OK=0
+
+        if wait $BACKEND_PID; then BACKEND_OK=1; fi
+        if wait $FRONTEND_PID; then FRONTEND_OK=1; fi
+        if wait $NGINX_PID; then NGINX_OK=1; fi
+
+        if [ $BACKEND_OK -eq 1 ] && [ $FRONTEND_OK -eq 1 ] && [ $NGINX_OK -eq 1 ]; then
+          echo "✅ All images ready"
+        else
+          echo "❌ Some images failed to pull"
           exit 1
         fi
-
-        echo "✅ All images ready"
 
         echo ""
         echo "📦 Final image status:"
