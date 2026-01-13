@@ -476,60 +476,27 @@ jobs:
         echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
         echo "✅ Docker Hub login successful"
 
-    - name: Configure and start Docker daemon
+    - name: Verify Docker daemon is running
       run: |
-        echo "🔧 Checking Docker configuration..."
-
-        # Check if already configured correctly
-        if [ -f /etc/docker/daemon.json ]; then
-          CURRENT_ROOT=$(grep -o '"data-root": *"[^"]*"' /etc/docker/daemon.json 2>/dev/null | cut -d'"' -f4 2>/dev/null)
-          if [ "$CURRENT_ROOT" = "/mnt/data/docker" ]; then
-            echo "✅ Docker already configured to use additional volume"
-            # Just verify daemon is running
-            if docker info >/dev/null 2>&1; then
-              echo "✅ Docker daemon is running"
-              docker info | grep "Docker Root Dir"
-              exit 0
-            fi
-          fi
-        fi
-
-        echo "🔧 Configuring Docker to use additional volume..."
-
-        # Create daemon.json if it doesn't exist
-        sudo mkdir -p /etc/docker
-
-        # Set Docker to use the additional volume
-        echo '{
-          "data-root": "/mnt/data/docker"
-        }' | sudo tee /etc/docker/daemon.json
-
-        echo "🔄 Restarting Docker daemon..."
-        sudo systemctl daemon-reload
-        sudo systemctl restart docker
-
-        # Wait longer for Docker to be fully ready
-        echo "⏳ Waiting for Docker daemon to be fully operational..."
-        for i in {1..12}; do  # 12 attempts = 60 seconds
-          if docker info >/dev/null 2>&1; then
-            echo "✅ Docker daemon is running (attempt $i)"
-            docker info | grep "Docker Root Dir"
-            break
-          else
-            echo "⏳ Docker daemon not ready yet... (attempt $i/12)"
-            sleep 5
-          fi
-        done
-
-        # Final check
+        echo "🔧 Verifying Docker daemon is running..."
         if docker info >/dev/null 2>&1; then
-          echo "✅ Docker daemon fully operational"
+          echo "✅ Docker daemon is running"
           docker info | grep "Docker Root Dir"
         else
-          echo "❌ Docker daemon failed to start after waiting"
-          sudo systemctl status docker
-          sudo journalctl -u docker --no-pager -n 20
-          exit 1
+          echo "❌ Docker daemon is not running"
+          echo "🔄 Attempting to start Docker daemon..."
+          sudo systemctl start docker
+          sleep 5
+
+          # Check again
+          if docker info >/dev/null 2>&1; then
+            echo "✅ Docker daemon started successfully"
+            docker info | grep "Docker Root Dir"
+          else
+            echo "❌ Failed to start Docker daemon"
+            sudo systemctl status docker
+            exit 1
+          fi
         fi
 
     - name: Pre-pull MySQL image (largest/heaviest)
