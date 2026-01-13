@@ -443,8 +443,23 @@ jobs:
         echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
         echo "✅ Docker Hub login successful"
 
-    - name: Pre-pull MySQL image (largest/heaviest)
+    - name: Ensure Docker daemon is running and pre-pull MySQL image
       run: |
+        echo "🔧 Ensuring Docker daemon is running..."
+        sudo systemctl start docker || echo "⚠️ Could not start Docker via systemctl"
+        sleep 3
+
+        # Test Docker connectivity
+        if docker info >/dev/null 2>&1; then
+          echo "✅ Docker daemon is running"
+          docker info | grep "Docker Root Dir"
+        else
+          echo "❌ Docker daemon is not responding"
+          sudo systemctl status docker || echo "⚠️ Could not check Docker status"
+          exit 1
+        fi
+
+        echo ""
         echo "🐳 Pre-pulling MySQL image first (largest image - ~500MB)..."
         if docker image inspect "mysql:8.0.35" >/dev/null 2>&1; then
           echo "✅ MySQL image already exists locally"
