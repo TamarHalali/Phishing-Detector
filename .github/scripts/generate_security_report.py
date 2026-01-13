@@ -371,11 +371,12 @@ class SecurityReportGenerator:
                 for pkg, vulns in sorted(packages.items()):
                     self.generate_package_summary(pkg, vulns, 'npm audit')
         
-        # Docker images
+        # Docker images - base images
+        self.add_section("🐳 Docker Base Images", 3)
         for key in ['trivy_python', 'trivy_node', 'trivy_mysql']:
             if key in scan_results:
                 image_name = key.replace('trivy_', '').replace('_', ':')
-                self.add_section(f"Docker Image: {image_name}", 3)
+                self.add_section(f"Base Image: {image_name}", 4)
                 results = scan_results[key]
                 if 'error' in results:
                     self.add_line(f"❌ Error: {results['error']}")
@@ -384,7 +385,25 @@ class SecurityReportGenerator:
                     for vuln in results.get('vulnerabilities', []):
                         pkg = vuln.get('pkgName', vuln.get('PkgName', 'Unknown'))
                         packages[pkg].append(vuln)
-                    
+
+                    for pkg, vulns in sorted(packages.items()):
+                        self.generate_package_summary(pkg, vulns, f"Trivy ({results.get('image', image_name)})")
+
+        # Docker images - built application images
+        self.add_section("🏗️ Built Application Images", 3)
+        for key in ['trivy_backend_built', 'trivy_frontend_built']:
+            if key in scan_results:
+                image_name = results.get('image', key.replace('trivy_', '').replace('_built', ''))
+                self.add_section(f"Built Image: {image_name}", 4)
+                results = scan_results[key]
+                if 'error' in results:
+                    self.add_line(f"❌ Error: {results['error']}")
+                else:
+                    packages = defaultdict(list)
+                    for vuln in results.get('vulnerabilities', []):
+                        pkg = vuln.get('pkgName', vuln.get('PkgName', 'Unknown'))
+                        packages[pkg].append(vuln)
+
                     for pkg, vulns in sorted(packages.items()):
                         self.generate_package_summary(pkg, vulns, f"Trivy ({results.get('image', image_name)})")
         
@@ -435,13 +454,13 @@ def main():
     else:
         print(f"⚠️ npm audit results file not found: {npm_audit_file}")
     
-    # Process Trivy results
+    # Process Trivy results - base images
     trivy_files = {
         'trivy_python': base_dir / 'python-base-scan.json',
         'trivy_node': base_dir / 'node-base-scan.json',
         'trivy_mysql': base_dir / 'mysql-base-scan.json'
     }
-    
+
     for key, file_path in trivy_files.items():
         if file_path.exists():
             print(f"📄 Processing Trivy results from {file_path}")
@@ -449,6 +468,20 @@ def main():
             scan_results[key] = generator.process_trivy_results(str(file_path), image_name)
         else:
             print(f"⚠️ Trivy results file not found: {file_path}")
+
+    # Process Trivy results - built images
+    built_image_files = {
+        'trivy_backend_built': backend_dir / 'backend-built-scan.json',
+        'trivy_frontend_built': frontend_dir / 'frontend-built-scan.json'
+    }
+
+    for key, file_path in built_image_files.items():
+        if file_path.exists():
+            print(f"📄 Processing built image Trivy results from {file_path}")
+            image_name = key.replace('trivy_', '').replace('_built', '').replace('_', '-')
+            scan_results[key] = generator.process_trivy_results(str(file_path), f"Built: {image_name}")
+        else:
+            print(f"⚠️ Built image Trivy results file not found: {file_path}")
     
     if not scan_results:
         print("❌ No scan results found! Cannot generate report.")
