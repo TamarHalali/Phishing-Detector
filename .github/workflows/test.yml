@@ -330,24 +330,32 @@ jobs:
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest
         echo "success=true" >> $GITHUB_OUTPUT
 
-    - name: Build and Push Nginx Image
-      id: nginx_build
-      run: |
-        cd phishing_detector
-        docker build -f nginx.Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:${{ steps.version.outputs.version }} .
-        docker build -f nginx.Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest .
 
-        echo "🔍 Scanning built nginx image for vulnerabilities..."
-        trivy image --severity HIGH,CRITICAL --format json --output nginx-built-scan.json ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest || true
-        trivy image --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest || true
-
-        echo "✅ Nginx image security scan completed - pushing to Docker Hub"
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:${{ steps.version.outputs.version }}
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest
-        echo "success=true" >> $GITHUB_OUTPUT
 
 
     
+    - name: Generate Security Report (including built images)
+      run: |
+        echo "📝 Generating comprehensive security report with built images..."
+
+        # Make sure script is executable
+        chmod +x .github/scripts/generate_security_report.py || true
+
+        # Run the report generator
+        if python3 .github/scripts/generate_security_report.py; then
+          echo "✅ Security report generated successfully"
+        else
+          echo "⚠️ Report generation had issues, but continuing..."
+        fi
+
+        echo ""
+        if [ -f SECURITY_SCAN_REPORT.md ]; then
+          echo "📄 Security Report Preview (first 50 lines):"
+          head -50 SECURITY_SCAN_REPORT.md
+        else
+          echo "⚠️ Security report file not found"
+        fi
+
     - name: Upload built images scan results
       uses: actions/upload-artifact@v4
       if: always()
@@ -356,6 +364,9 @@ jobs:
         path: |
           phishing_detector/backend/backend-built-scan.json
           phishing_detector/frontend/frontend-built-scan.json
+          nginx-built-scan.json
+          SECURITY_SCAN_REPORT.md
+          security-scan-summary.json
     
 
     - name: Update GitHub Variable
@@ -493,64 +504,29 @@ jobs:
               retries: 5
               start_period: 60s
         
-          backend1:
+          backend:
             image: ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
-            environment:
-              - FLASK_ENV=production
-              - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
-              - GEMINI_API_KEY=${GEMINI_API_KEY}
-              - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
-              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-            depends_on:
-              mysql:
-                condition: service_healthy
-            restart: unless-stopped
-        
-          backend2:
-            image: ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
-            environment:
-              - FLASK_ENV=production
-              - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
-              - GEMINI_API_KEY=${GEMINI_API_KEY}
-              - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
-              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-            depends_on:
-              mysql:
-                condition: service_healthy
-            restart: unless-stopped
-        
-          backend3:
-            image: ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
-            environment:
-              - FLASK_ENV=production
-              - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
-              - GEMINI_API_KEY=${GEMINI_API_KEY}
-              - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
-              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-            depends_on:
-              mysql:
-                condition: service_healthy
-            restart: unless-stopped
-        
-          frontend:
-            image: ${DOCKERHUB_USERNAME}/phishing-detector-frontend:latest
-            container_name: phishing-frontend
-            depends_on:
-              backend1:
-                condition: service_started
-            restart: unless-stopped
-        
-          nginx:
-            image: ${DOCKERHUB_USERNAME}/phishing-detector-nginx:latest
-            container_name: phishing-nginx
+            container_name: phishing-backend
             ports:
               - "80:80"
+            environment:
+              - FLASK_ENV=production
+              - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
+              - GEMINI_API_KEY=${GEMINI_API_KEY}
+              - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
+              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
             depends_on:
-              - frontend
-              - backend1
-              - backend2
-              - backend3
+              mysql:
+                condition: service_healthy
             restart: unless-stopped
+            healthcheck:
+              test: ["CMD", "curl", "-f", "http://localhost/health"]
+              interval: 30s
+              timeout: 10s
+              retries: 3
+              start_period: 40s
+        
+
         
         volumes:
           mysql_data:
@@ -590,32 +566,12 @@ jobs:
           exit 1
         fi
 
-        # Pull other images in parallel
-        pull_if_needed "${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest" "Backend" &
-        BACKEND_PID=$!
-
-        pull_if_needed "${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest" "Frontend" &
-        FRONTEND_PID=$!
-
-        pull_if_needed "nginx:alpine" "Nginx" &
-        NGINX_PID=$!
-
-        # Wait for remaining pulls
-        echo "⏳ Waiting for remaining images..."
-        BACKEND_OK=0
-        FRONTEND_OK=0
-        NGINX_OK=0
-
-        if wait $BACKEND_PID; then BACKEND_OK=1; fi
-        if wait $FRONTEND_PID; then FRONTEND_OK=1; fi
-        if wait $NGINX_PID; then NGINX_OK=1; fi
-
-        if [ $BACKEND_OK -eq 1 ] && [ $FRONTEND_OK -eq 1 ] && [ $NGINX_OK -eq 1 ]; then
-          echo "✅ All images ready"
-        else
-          echo "❌ Some images failed to pull"
+        # Pull backend image (now includes nginx and serves everything)
+        if ! pull_if_needed "${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest" "Backend"; then
           exit 1
         fi
+
+        echo "✅ All images ready"
 
         echo ""
         echo "📦 Final image status:"
@@ -668,18 +624,9 @@ jobs:
         fi
         
         echo ""
-        echo "🔍 Checking backend services..."
-        for i in {1..3}; do
-          echo "📋 Backend$i logs (last 10 lines):"
-          docker-compose -f docker-compose.prod.yml logs backend$i | tail -10 || echo "⚠️  Could not get logs for backend$i"
-          echo ""
-        done
-        
-        echo "🔍 Checking frontend service..."
-        docker-compose -f docker-compose.prod.yml logs frontend | tail -10 || echo "⚠️  Could not get logs for frontend"
-        
-        echo "🔍 Checking nginx service..."
-        docker-compose -f docker-compose.prod.yml logs nginx | tail -10 || echo "⚠️  Could not get logs for nginx"
+        echo "🔍 Checking backend service..."
+        echo "📋 Backend logs (last 10 lines):"
+        docker-compose -f docker-compose.prod.yml logs backend | tail -10 || echo "⚠️  Could not get logs for backend"
         
         echo ""
         echo "📊 Final container status:"
@@ -700,16 +647,16 @@ jobs:
           echo "✅ Frontend is responding on http://localhost/"
         else
           echo "⚠️  Frontend check failed on http://localhost/"
-          echo "📋 Nginx logs:"
-          docker-compose -f docker-compose.prod.yml logs nginx | tail -20
+          echo "📋 Backend (nginx) logs:"
+          docker-compose -f docker-compose.prod.yml logs backend | tail -20
         fi
-        
+
         if curl -f -s http://localhost/api/health > /dev/null 2>&1 || curl -f -s http://localhost/api/ > /dev/null 2>&1; then
           echo "✅ API is responding on http://localhost/api/"
         else
           echo "⚠️  API check failed on http://localhost/api/"
           echo "📋 Backend logs:"
-          docker-compose -f docker-compose.prod.yml logs backend1 | tail -20
+          docker-compose -f docker-compose.prod.yml logs backend | tail -20
         fi
         
         echo ""
