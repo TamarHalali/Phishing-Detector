@@ -240,7 +240,7 @@ jobs:
         MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
       run: |
         cd phishing_detector
-        docker-compose exec -T backend1 python -m pytest tests/test_db.py -v
+        docker-compose exec -T backend python -m pytest tests/test_db.py -v
     
     - name: Cleanup
       env:
@@ -295,7 +295,6 @@ jobs:
         fi
 
         echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
-        echo "New version will be: $NEW_VERSION"
     
     - name: Login to Docker Hub
       run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
@@ -452,6 +451,28 @@ jobs:
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
 
     steps:
+    - name: Emergency cleanup (kill old containers)
+      run: |
+        echo "🧹 Emergency cleanup of old containers to free resources..."
+        echo "📊 Current Docker status:"
+        docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" || echo "⚠️ Could not list containers"
+
+        # Stop all running containers
+        echo "🛑 Stopping all running containers..."
+        docker stop $(docker ps -aq) || echo "⚠️ No running containers to stop"
+
+        # Remove all containers
+        echo "🗑️ Removing all containers..."
+        docker rm -f $(docker ps -aq) || echo "⚠️ No containers to remove"
+
+        # Quick cleanup
+        echo "🧽 Quick system cleanup..."
+        docker system prune -f || echo "⚠️ System prune failed"
+
+        echo "✅ Emergency cleanup completed"
+        echo "📊 Docker status after cleanup:"
+        docker ps -a || echo "✅ No containers running"
+
     - name: Check system status
       run: |
         echo "🚀 Starting deployment to EC2..."
@@ -554,37 +575,9 @@ jobs:
               retries: 5
               start_period: 60s
         
-          backend1:
+          backend:
             image: ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
-            container_name: phishing-backend1
-            environment:
-              - FLASK_ENV=production
-              - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
-              - GEMINI_API_KEY=${GEMINI_API_KEY}
-              - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
-              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-            depends_on:
-              mysql:
-                condition: service_healthy
-            restart: unless-stopped
-
-          backend2:
-            image: ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
-            container_name: phishing-backend2
-            environment:
-              - FLASK_ENV=production
-              - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
-              - GEMINI_API_KEY=${GEMINI_API_KEY}
-              - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
-              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-            depends_on:
-              mysql:
-                condition: service_healthy
-            restart: unless-stopped
-
-          backend3:
-            image: ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
-            container_name: phishing-backend3
+            container_name: phishing-backend
             environment:
               - FLASK_ENV=production
               - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
@@ -600,7 +593,7 @@ jobs:
             image: ${DOCKERHUB_USERNAME}/phishing-detector-frontend:latest
             container_name: phishing-frontend
             depends_on:
-              backend1:
+              backend:
                 condition: service_started
             restart: unless-stopped
 
@@ -613,9 +606,7 @@ jobs:
               - ./nginx.conf:/etc/nginx/nginx.conf:ro
             depends_on:
               - frontend
-              - backend1
-              - backend2
-              - backend3
+              - backend
             restart: unless-stopped
         
 
