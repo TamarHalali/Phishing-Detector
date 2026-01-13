@@ -405,9 +405,13 @@ jobs:
         echo "🛑 Stopping existing containers..."
         docker-compose down || echo "⚠️  No existing docker-compose to stop"
         docker-compose -f docker-compose.prod.yml down || echo "⚠️  No existing docker-compose.prod.yml to stop"
-        echo "🧹 Cleaning up Docker system..."
-        docker system prune -f || echo "⚠️  Docker prune failed"
-        echo "✅ Cleanup completed"
+
+        echo "🧹 Light cleanup (keeping images to reduce pull time)..."
+        # Only remove stopped containers and networks, keep images
+        docker container prune -f || echo "⚠️  Container prune failed"
+        docker network prune -f || echo "⚠️  Network prune failed"
+
+        echo "✅ Cleanup completed (images preserved for faster redeployment)"
     
     - name: Create docker-compose.yml for production
       env:
@@ -523,24 +527,64 @@ jobs:
     
     - name: Pull latest images
       run: |
-        echo "📥 Pulling latest Docker images..."
-        echo "🐳 Pulling backend image..."
-        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest || { echo "❌ Failed to pull backend image"; exit 1; }
-        echo "✅ Backend image pulled"
-        
-        echo "🐳 Pulling frontend image..."
-        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest || { echo "❌ Failed to pull frontend image"; exit 1; }
-        echo "✅ Frontend image pulled"
-        
-        echo "🐳 Pulling MySQL image..."
-        docker pull mysql:8.0.35 || { echo "❌ Failed to pull MySQL image"; exit 1; }
-        echo "✅ MySQL image pulled"
-        
-        echo "🐳 Pulling Nginx image..."
-        docker pull nginx:alpine || { echo "❌ Failed to pull Nginx image"; exit 1; }
-        echo "✅ Nginx image pulled"
-        
-        echo "📦 All images pulled successfully"
+        echo "📥 Checking and pulling Docker images as needed..."
+
+        # Function to check if image exists and pull only if needed
+        pull_if_needed() {
+          local image=$1
+          local name=$2
+          if docker image inspect "$image" >/dev/null 2>&1; then
+            echo "✅ $name image already exists locally - skipping pull"
+            return 0
+          else
+            echo "🐳 Pulling $name image..."
+            if docker pull "$image"; then
+              echo "✅ $name image pulled successfully"
+              return 0
+            else
+              echo "❌ Failed to pull $name image"
+              return 1
+            fi
+          fi
+        }
+
+        # Start pulls in background where possible
+        echo "🚀 Starting optimized image pulls..."
+
+        # MySQL is the largest - pull it first (not in background to monitor progress)
+        if ! pull_if_needed "mysql:8.0.35" "MySQL"; then
+          exit 1
+        fi
+
+        # Pull other images in parallel
+        pull_if_needed "${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest" "Backend" &
+        BACKEND_PID=$!
+
+        pull_if_needed "${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest" "Frontend" &
+        FRONTEND_PID=$!
+
+        pull_if_needed "nginx:alpine" "Nginx" &
+        NGINX_PID=$!
+
+        # Wait for remaining pulls
+        echo "⏳ Waiting for remaining images..."
+        BACKEND_OK=0
+        FRONTEND_OK=0
+        NGINX_OK=0
+
+        if wait $BACKEND_PID; then BACKEND_OK=1; fi
+        if wait $FRONTEND_PID; then FRONTEND_OK=1; fi
+        if wait $NGINX_PID; then NGINX_OK=1; fi
+
+        if [ $BACKEND_OK -eq 1 ] && [ $FRONTEND_OK -eq 1 ] && [ $NGINX_OK -eq 1 ]; then
+          echo "✅ All images ready"
+        else
+          echo "❌ Some images failed to pull"
+          exit 1
+        fi
+
+        echo ""
+        echo "📦 Final image status:"
         docker images | grep -E "(phishing-detector|mysql|nginx)" || echo "⚠️  Could not verify images"
     
     - name: Start services with docker-compose
@@ -651,4 +695,3 @@ jobs:
         echo "🔍 Docker network info:"
         docker network ls
         docker network inspect $(docker-compose -f docker-compose.prod.yml ps -q | head -1 | xargs docker inspect --format='{{range .NetworkSettings.Networks}}{{.NetworkID}}{{end}}' 2>/dev/null) 2>/dev/null || echo "⚠️  Could not inspect network"
-    
