@@ -419,28 +419,6 @@ jobs:
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
 
     steps:
-    - name: Free up system resources
-      run: |
-        echo "🧹 Freeing up system resources before deployment..."
-        echo "📊 Memory status before cleanup:"
-        free -h || echo "⚠️ Could not check memory"
-        echo ""
-
-        # Stop any unnecessary services
-        sudo systemctl stop packagekit || true
-        sudo systemctl stop cups || true
-
-        # Clean package cache
-        sudo yum clean all || sudo apt-get clean || echo "⚠️ Could not clean package cache"
-
-        # Clear system cache
-        sudo sync
-        echo 3 | sudo tee /proc/sys/vm/drop_caches || echo "⚠️ Could not drop caches"
-
-        echo "📊 Memory status after cleanup:"
-        free -h || echo "⚠️ Could not check memory"
-        echo "✅ System cleanup completed"
-
     - name: Check system status
       run: |
         echo "🚀 Starting deployment to EC2..."
