@@ -370,11 +370,38 @@ jobs:
   deploy-to-ec2:
     needs: [build-and-push]
     runs-on: self-hosted
+    timeout-minutes: 15
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    
+
     steps:
+    - name: Free up system resources
+      run: |
+        echo "🧹 Freeing up system resources before deployment..."
+        echo "📊 Memory status before cleanup:"
+        free -h || echo "⚠️ Could not check memory"
+        echo ""
+
+        # Stop any unnecessary services
+        sudo systemctl stop packagekit || true
+        sudo systemctl stop cups || true
+
+        # Clean package cache
+        sudo yum clean all || sudo apt-get clean || echo "⚠️ Could not clean package cache"
+
+        # Clear system cache
+        sudo sync
+        echo 3 | sudo tee /proc/sys/vm/drop_caches || echo "⚠️ Could not drop caches"
+
+        echo "📊 Memory status after cleanup:"
+        free -h || echo "⚠️ Could not check memory"
+        echo "✅ System cleanup completed"
+
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+        sparse-checkout: |
+          phishing_detector/
     
     - name: Check system status
       run: |
@@ -399,7 +426,18 @@ jobs:
         echo "🔐 Logging in to Docker Hub..."
         echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
         echo "✅ Docker Hub login successful"
-    
+
+    - name: Pre-pull MySQL image (largest/heaviest)
+      run: |
+        echo "🐳 Pre-pulling MySQL image first (largest image - ~500MB)..."
+        if docker image inspect "mysql:8.0.35" >/dev/null 2>&1; then
+          echo "✅ MySQL image already exists locally"
+        else
+          echo "📥 Downloading MySQL image (this may take a few minutes)..."
+          docker pull mysql:8.0.35
+          echo "✅ MySQL image downloaded successfully"
+        fi
+
     - name: Stop existing containers
       run: |
         echo "🛑 Stopping existing containers..."
