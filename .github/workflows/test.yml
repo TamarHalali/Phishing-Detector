@@ -320,15 +320,33 @@ jobs:
         cd phishing_detector/frontend
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }} .
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest .
-        
+
         echo "🔍 Scanning built frontend image for vulnerabilities..."
         trivy image --severity HIGH,CRITICAL --format json --output frontend-built-scan.json ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest || true
         trivy image --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest || true
-        
+
         echo "✅ Frontend image security scan completed - pushing to Docker Hub"
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }}
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest
         echo "success=true" >> $GITHUB_OUTPUT
+
+    - name: Build and Push Nginx Image
+      id: nginx_build
+      run: |
+        cd phishing_detector
+        docker build -f nginx.Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:${{ steps.version.outputs.version }} .
+        docker build -f nginx.Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest .
+
+        echo "🔍 Scanning built nginx image for vulnerabilities..."
+        trivy image --severity HIGH,CRITICAL --format json --output nginx-built-scan.json ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest || true
+        trivy image --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest || true
+
+        echo "✅ Nginx image security scan completed - pushing to Docker Hub"
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:${{ steps.version.outputs.version }}
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest
+        echo "success=true" >> $GITHUB_OUTPUT
+
+
     
     - name: Upload built images scan results
       uses: actions/upload-artifact@v4
@@ -338,8 +356,6 @@ jobs:
         path: |
           phishing_detector/backend/backend-built-scan.json
           phishing_detector/frontend/frontend-built-scan.json
-          SECURITY_SCAN_REPORT.md
-          security-scan-summary.json
     
 
     - name: Update GitHub Variable
@@ -398,11 +414,6 @@ jobs:
         free -h || echo "⚠️ Could not check memory"
         echo "✅ System cleanup completed"
 
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 1
-    
     - name: Check system status
       run: |
         echo "🚀 Starting deployment to EC2..."
@@ -530,12 +541,10 @@ jobs:
             restart: unless-stopped
         
           nginx:
-            image: nginx:alpine
+            image: ${DOCKERHUB_USERNAME}/phishing-detector-nginx:latest
             container_name: phishing-nginx
             ports:
               - "80:80"
-            volumes:
-              - ./phishing_detector/nginx.conf:/etc/nginx/nginx.conf:ro
             depends_on:
               - frontend
               - backend1
@@ -549,20 +558,7 @@ jobs:
         echo "✅ docker-compose.prod.yml created"
         echo "📄 File contents preview:"
         head -20 docker-compose.prod.yml
-    
-    - name: Verify nginx config exists
-      run: |
-        echo "📝 Verifying nginx.conf exists..."
-        if [ -f phishing_detector/nginx.conf ]; then
-          echo "✅ nginx.conf found in repository"
-          echo "📄 File contents preview:"
-          head -20 phishing_detector/nginx.conf
-        else
-          echo "❌ ERROR: nginx.conf not found in repository!"
-          echo "This should not happen after checkout. Please check the repository structure."
-          exit 1
-        fi
-    
+
     - name: Pull latest images
       run: |
         echo "📥 Checking and pulling Docker images as needed..."
