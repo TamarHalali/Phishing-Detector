@@ -10,8 +10,8 @@ RUN apk update && apk upgrade && \
 # Copy package files first for better caching
 COPY package*.json ./
 
-# Install dependencies with exact versions for reproducibility
-RUN npm ci --omit=dev --no-audit --no-fund
+# Install dependencies
+RUN npm install --omit=dev --no-audit --no-fund
 
 # Copy source code
 COPY . .
