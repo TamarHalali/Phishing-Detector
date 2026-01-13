@@ -240,7 +240,7 @@ jobs:
         MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
       run: |
         cd phishing_detector
-        docker-compose exec -T backend python -m pytest tests/test_db.py -v
+        docker-compose exec -T backend1 python -m pytest tests/test_db.py -v
     
     - name: Cleanup
       env:
