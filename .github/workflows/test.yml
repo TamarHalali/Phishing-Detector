@@ -469,16 +469,131 @@ jobs:
         ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
         echo "✅ SSH setup completed"
 
-    - name: Trigger deployment on EC2
+    - name: Deploy to EC2 via SSH
       run: |
-        echo "🚀 Triggering deployment on EC2..."
+        echo "🚀 Starting deployment on EC2..."
+
+        # Create docker-compose.prod.yml on EC2
         ssh -i ~/.ssh/deploy_key \
             -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
             -o LogLevel=ERROR \
-            ec2-user@${{ secrets.EC2_HOST }} \
-            "bash /home/ec2-user/deploy.sh"
-        echo "✅ Deployment command sent to EC2"
+            ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
+        echo "📝 Creating docker-compose.prod.yml..."
+        cat > /home/ec2-user/docker-compose.prod.yml << 'DOCKER_COMPOSE_EOF'
+        version: '3.8'
+
+        services:
+          mysql:
+            image: mysql:8.0.35
+            container_name: phishing-mysql
+            environment:
+              MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+              MYSQL_DATABASE: phishing_db
+              MYSQL_USER: phishing_user
+              MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+            volumes:
+              - mysql_data:/var/lib/mysql
+            restart: unless-stopped
+            healthcheck:
+              test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+              interval: 30s
+              timeout: 10s
+              retries: 5
+              start_period: 60s
+
+          backend1:
+            image: tamarhalali/phishing-detector-backend:latest
+            container_name: phishing-backend1
+            environment:
+              - FLASK_ENV=production
+              - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
+              - GEMINI_API_KEY=${GEMINI_API_KEY}
+              - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
+              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+            depends_on:
+              mysql:
+                condition: service_healthy
+            restart: unless-stopped
+
+          backend2:
+            image: tamarhalali/phishing-detector-backend:latest
+            container_name: phishing-backend2
+            environment:
+              - FLASK_ENV=production
+              - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
+              - GEMINI_API_KEY=${GEMINI_API_KEY}
+              - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
+              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+            depends_on:
+              mysql:
+                condition: service_healthy
+            restart: unless-stopped
+
+          backend3:
+            image: tamarhalali/phishing-detector-backend:latest
+            container_name: phishing-backend3
+            environment:
+              - FLASK_ENV=production
+              - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
+              - GEMINI_API_KEY=${GEMINI_API_KEY}
+              - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
+              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+            depends_on:
+              mysql:
+                condition: service_healthy
+            restart: unless-stopped
+
+          frontend:
+            image: tamarhalali/phishing-detector-frontend:latest
+            container_name: phishing-frontend
+            depends_on:
+              backend1:
+                condition: service_started
+            restart: unless-stopped
+
+          nginx:
+            image: tamarhalali/phishing-detector-nginx:latest
+            container_name: phishing-nginx
+            ports:
+              - "80:80"
+            volumes:
+              - ./nginx.conf:/etc/nginx/nginx.conf:ro
+            depends_on:
+              - frontend
+              - backend1
+              - backend2
+              - backend3
+            restart: unless-stopped
+
+        volumes:
+          mysql_data:
+        DOCKER_COMPOSE_EOF
+
+        echo "🧹 Emergency cleanup..."
+        docker stop $(docker ps -aq 2>/dev/null) 2>/dev/null || true
+        docker rm -f $(docker ps -aq 2>/dev/null) 2>/dev/null || true
+        docker system prune -f 2>/dev/null || true
+
+        echo "🐳 Pulling latest images..."
+        docker pull mysql:8.0.35
+        docker pull tamarhalali/phishing-detector-backend:latest
+        docker pull tamarhalali/phishing-detector-frontend:latest
+        docker pull tamarhalali/phishing-detector-nginx:latest
+
+        echo "🚀 Starting containers..."
+        docker-compose -f /home/ec2-user/docker-compose.prod.yml up -d
+
+        echo "⏳ Waiting for services..."
+        sleep 30
+
+        echo "🔍 Checking status..."
+        docker-compose -f /home/ec2-user/docker-compose.prod.yml ps
+
+        echo "✅ Deployment completed!"
+        EOF
+
+        echo "✅ Deployment command executed on EC2"
 
     - name: Verify deployment
       run: |
