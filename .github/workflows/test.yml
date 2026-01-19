@@ -463,7 +463,12 @@ jobs:
     - name: Trigger deployment on EC2
       run: |
         echo "🚀 Triggering deployment on EC2..."
-        ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "bash /home/ec2-user/deploy.sh"
+        ssh -i ~/.ssh/deploy_key \
+            -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            -o LogLevel=ERROR \
+            ec2-user@${{ secrets.EC2_HOST }} \
+            "bash /home/ec2-user/deploy.sh"
         echo "✅ Deployment command sent to EC2"
 
     - name: Verify deployment
