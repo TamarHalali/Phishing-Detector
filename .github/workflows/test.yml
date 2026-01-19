@@ -455,9 +455,18 @@ jobs:
       run: |
         echo "🔑 Setting up SSH for deployment..."
         mkdir -p ~/.ssh
+
+        # Save SSH key directly (it's already in PEM text format)
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
         chmod 600 ~/.ssh/deploy_key
-        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+        # Verify the key format
+        if ! ssh-keygen -l -f ~/.ssh/deploy_key >/dev/null 2>&1; then
+          echo "❌ Invalid SSH private key format"
+          exit 1
+        fi
+
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
         echo "✅ SSH setup completed"
 
     - name: Trigger deployment on EC2
