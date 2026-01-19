@@ -446,345 +446,42 @@ jobs:
 
   deploy-to-ec2:
     needs: [build-and-push]
-    runs-on: self-hosted
-    timeout-minutes: 25
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
 
     steps:
-    - name: Emergency cleanup (kill old containers)
+    - name: Setup SSH
       run: |
-        echo "🧹 Emergency cleanup of old containers to free resources..."
-        echo "📊 Current Docker status:"
-        docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" || echo "⚠️ Could not list containers"
+        echo "🔑 Setting up SSH for deployment..."
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+        chmod 600 ~/.ssh/deploy_key
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+        echo "✅ SSH setup completed"
 
-        # Stop all running containers
-        echo "🛑 Stopping all running containers..."
-        docker stop $(docker ps -aq) || echo "⚠️ No running containers to stop"
-
-        # Remove all containers
-        echo "🗑️ Removing all containers..."
-        docker rm -f $(docker ps -aq) || echo "⚠️ No containers to remove"
-
-        # Quick cleanup
-        echo "🧽 Quick system cleanup..."
-        docker system prune -f || echo "⚠️ System prune failed"
-
-        echo "✅ Emergency cleanup completed"
-        echo "📊 Docker status after cleanup:"
-        docker ps -a || echo "✅ No containers running"
-
-    - name: Check system status
+    - name: Trigger deployment on EC2
       run: |
-        echo "🚀 Starting deployment to EC2..."
-        echo "📍 Current directory: $(pwd)"
-        echo "👤 Current user: $(whoami)"
-        echo "🖥️  Hostname: $(hostname)"
-        echo "📅 Date: $(date)"
-        echo ""
-        echo "🔍 Checking Docker installation..."
-        docker --version || echo "❌ Docker not found!"
-        docker-compose --version || echo "❌ Docker Compose not found!"
-        echo ""
-        echo "🔍 Checking running containers..."
-        docker ps -a || echo "⚠️  Could not list containers"
-        echo ""
-        echo "🔍 Checking Docker images..."
-        docker images | head -10 || echo "⚠️  Could not list images"
-    
-    - name: Login to Docker Hub
+        echo "🚀 Triggering deployment on EC2..."
+        ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "bash /home/ec2-user/deploy.sh"
+        echo "✅ Deployment command sent to EC2"
+
+    - name: Verify deployment
       run: |
-        echo "🔐 Logging in to Docker Hub..."
-        echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-        echo "✅ Docker Hub login successful"
-
-
-
-    - name: Pre-pull MySQL image (largest/heaviest)
-      run: |
-        echo "🐳 Pre-pulling MySQL image first (largest image - ~500MB)..."
-        if docker image inspect "mysql:8.0.35" >/dev/null 2>&1; then
-          echo "✅ MySQL image already exists locally"
-        else
-          echo "📥 Downloading MySQL image (this may take a few minutes)..."
-          docker pull mysql:8.0.35
-          echo "✅ MySQL image downloaded successfully"
-        fi
-
-    - name: Stop existing containers
-      run: |
-        echo "🛑 Stopping existing containers..."
-        docker-compose down || echo "⚠️  No existing docker-compose to stop"
-        docker-compose -f docker-compose.prod.yml down || echo "⚠️  No existing docker-compose.prod.yml to stop"
-
-        echo "🧹 Light cleanup (keeping images to reduce pull time)..."
-        # Only remove stopped containers and networks, keep images
-        docker container prune -f || echo "⚠️  Container prune failed"
-        docker network prune -f || echo "⚠️  Network prune failed"
-
-        echo "✅ Cleanup completed (images preserved for faster redeployment)"
-    
-    - name: Create docker-compose.yml for production
-      env:
-        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-        MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-        MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
-      run: |
-        echo "📝 Creating docker-compose.prod.yml..."
-        cat > docker-compose.prod.yml << EOF
-        version: '3.8'
-
-        services:
-          mysql:
-            image: mysql:8.0.35
-            container_name: phishing-mysql
-            environment:
-              MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-              MYSQL_DATABASE: phishing_db
-              MYSQL_USER: phishing_user
-              MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-            volumes:
-              - mysql_data:/var/lib/mysql
-            restart: unless-stopped
-            healthcheck:
-              test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-              interval: 30s
-              timeout: 10s
-              retries: 5
-              start_period: 60s
-
-          backend1:
-            image: ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
-            container_name: phishing-backend1
-            environment:
-              - FLASK_ENV=production
-              - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
-              - GEMINI_API_KEY=${GEMINI_API_KEY}
-              - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
-              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-            depends_on:
-              mysql:
-                condition: service_healthy
-            restart: unless-stopped
-
-          backend2:
-            image: ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
-            container_name: phishing-backend2
-            environment:
-              - FLASK_ENV=production
-              - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
-              - GEMINI_API_KEY=${GEMINI_API_KEY}
-              - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
-              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-            depends_on:
-              mysql:
-                condition: service_healthy
-            restart: unless-stopped
-
-          backend3:
-            image: ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
-            container_name: phishing-backend3
-            environment:
-              - FLASK_ENV=production
-              - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
-              - GEMINI_API_KEY=${GEMINI_API_KEY}
-              - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
-              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-            depends_on:
-              mysql:
-                condition: service_healthy
-            restart: unless-stopped
-
-          frontend:
-            image: ${DOCKERHUB_USERNAME}/phishing-detector-frontend:latest
-            container_name: phishing-frontend
-            depends_on:
-              backend1:
-                condition: service_started
-            restart: unless-stopped
-
-          nginx:
-            image: ${DOCKERHUB_USERNAME}/phishing-detector-nginx:latest
-            container_name: phishing-nginx
-            ports:
-              - "80:80"
-            volumes:
-              - ./nginx.conf:/etc/nginx/nginx.conf:ro
-            depends_on:
-              - frontend
-              - backend1
-              - backend2
-              - backend3
-            restart: unless-stopped
-
-
-
-        volumes:
-          mysql_data:
-        EOF
-        echo "✅ docker-compose.prod.yml created"
-        echo "📄 File contents preview:"
-        head -20 docker-compose.prod.yml
-
-    - name: Pull latest images
-      run: |
-        echo "📥 Checking and pulling Docker images as needed..."
-
-        # Function to check if image exists and pull only if needed
-        pull_if_needed() {
-          local image=$1
-          local name=$2
-          if docker image inspect "$image" >/dev/null 2>&1; then
-            echo "✅ $name image already exists locally - skipping pull"
-            return 0
-          else
-            echo "🐳 Pulling $name image..."
-            if docker pull "$image"; then
-              echo "✅ $name image pulled successfully"
-              return 0
-            else
-              echo "❌ Failed to pull $name image"
-              return 1
-            fi
-          fi
-        }
-
-        # Start pulls in background where possible
-        echo "🚀 Starting optimized image pulls..."
-
-        # MySQL is the largest - pull it first (not in background to monitor progress)
-        if ! pull_if_needed "mysql:8.0.35" "MySQL"; then
-          exit 1
-        fi
-
-        # Pull other images in parallel
-        pull_if_needed "${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest" "Backend" &
-        BACKEND_PID=$!
-
-        pull_if_needed "${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest" "Frontend" &
-        FRONTEND_PID=$!
-
-        pull_if_needed "${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest" "Nginx" &
-        NGINX_PID=$!
-
-        # Wait for remaining pulls
-        echo "⏳ Waiting for remaining images..."
-        BACKEND_OK=0
-        FRONTEND_OK=0
-        NGINX_OK=0
-
-        if wait $BACKEND_PID; then BACKEND_OK=1; fi
-        if wait $FRONTEND_PID; then FRONTEND_OK=1; fi
-        if wait $NGINX_PID; then NGINX_OK=1; fi
-
-        if [ $BACKEND_OK -eq 1 ] && [ $FRONTEND_OK -eq 1 ] && [ $NGINX_OK -eq 1 ]; then
-          echo "✅ All images ready"
-        else
-          echo "❌ Some images failed to pull"
-          exit 1
-        fi
-
-        echo ""
-        echo "📦 Final image status:"
-        docker images | grep -E "(phishing-detector|mysql|nginx)" || echo "⚠️  Could not verify images"
-    
-    - name: Start services with docker-compose
-      env:
-        MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-        MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
-      run: |
-        echo "🚀 Starting services with docker-compose..."
-        echo "📋 Using docker-compose.prod.yml"
-        docker-compose -f docker-compose.prod.yml up -d
-        echo "⏳ Waiting 5 seconds for services to initialize..."
-        sleep 5
-        echo "🔍 Checking container status..."
-        docker-compose -f docker-compose.prod.yml ps || docker ps
-    
-    - name: Wait for services
-      run: |
-        echo "⏳ Waiting for services to start..."
-        echo "📊 Current container status:"
-        docker-compose -f docker-compose.prod.yml ps || docker ps
-        
-        echo ""
-        echo "⏳ Waiting 30 seconds for services to initialize..."
+        echo "⏳ Waiting 30 seconds for deployment to complete..."
         sleep 30
-        
-        echo ""
-        echo "🔍 Checking MySQL health..."
-        MAX_RETRIES=10
-        RETRY_COUNT=0
-        while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-          if docker-compose -f docker-compose.prod.yml exec -T mysql mysqladmin ping -h localhost --silent 2>/dev/null; then
-            echo "✅ MySQL is healthy!"
-            break
-          else
-            RETRY_COUNT=$((RETRY_COUNT + 1))
-            echo "⏳ MySQL not ready yet... ($RETRY_COUNT/$MAX_RETRIES)"
-            sleep 5
-          fi
-        done
-        
-        if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-          echo "❌ MySQL health check failed after $MAX_RETRIES attempts"
-          echo "📋 MySQL logs:"
-          docker-compose -f docker-compose.prod.yml logs mysql | tail -20
-        fi
-        
-        echo ""
-        echo "🔍 Checking backend service..."
-        echo "📋 Backend logs (last 10 lines):"
-        docker-compose -f docker-compose.prod.yml logs backend | tail -10 || echo "⚠️  Could not get logs for backend"
-        
-        echo ""
-        echo "📊 Final container status:"
-        docker-compose -f docker-compose.prod.yml ps || docker ps
-    
-    - name: Verify HTTP deployment
-      run: |
-        echo "⏳ Waiting additional 10 seconds for all services..."
-        sleep 10
-        
-        echo ""
-        echo "🔍 Checking port 80..."
-        netstat -tuln | grep :80 || ss -tuln | grep :80 || echo "⚠️  Could not check port 80"
-        
-        echo ""
-        echo "🔍 Testing local HTTP connectivity..."
-        if curl -f -s http://localhost/ > /dev/null; then
-          echo "✅ Frontend is responding on http://localhost/"
+
+        echo "🔍 Checking if application is responding..."
+        if curl -f -s --max-time 10 http://${{ secrets.EC2_HOST }}/ > /dev/null; then
+          echo "✅ Frontend is responding!"
         else
-          echo "⚠️  Frontend check failed on http://localhost/"
-          echo "📋 Backend (nginx) logs:"
-          docker-compose -f docker-compose.prod.yml logs backend | tail -20
+          echo "⚠️ Frontend check failed - deployment may still be in progress"
         fi
 
-        if curl -f -s http://localhost/api/health > /dev/null 2>&1 || curl -f -s http://localhost/api/ > /dev/null 2>&1; then
-          echo "✅ API is responding on http://localhost/api/"
+        if curl -f -s --max-time 10 http://${{ secrets.EC2_HOST }}/api/health > /dev/null 2>&1; then
+          echo "✅ API is responding!"
         else
-          echo "⚠️  API check failed on http://localhost/api/"
-          echo "📋 Backend logs:"
-          docker-compose -f docker-compose.prod.yml logs backend | tail -20
+          echo "⚠️ API check failed - deployment may still be in progress"
         fi
-        
-        echo ""
-        echo "🌐 Getting public IP address..."
-        PUBLIC_IP=$(curl -s ifconfig.me || curl -s ipinfo.io/ip || echo "Could not determine")
-        echo "📍 Public IP: $PUBLIC_IP"
-        
-        echo ""
-        echo "🚀 Deployment completed!"
-        echo "✅ Services should be available at:"
-        echo "   - Frontend: http://$PUBLIC_IP/"
-        echo "   - API: http://$PUBLIC_IP/api/"
-        echo ""
-        echo "📊 Final container status:"
-        docker-compose -f docker-compose.prod.yml ps || docker ps
-        echo ""
-        echo "🔍 Docker network info:"
-        docker network ls
-        docker network inspect $(docker-compose -f docker-compose.prod.yml ps -q | head -1 | xargs docker inspect --format='{{range .NetworkSettings.Networks}}{{.NetworkID}}{{end}}' 2>/dev/null) 2>/dev/null || echo "⚠️  Could not inspect network"
+
+        echo "✅ Deployment verification completed"
