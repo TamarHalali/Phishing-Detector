@@ -240,7 +240,7 @@ jobs:
         MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
       run: |
         cd phishing_detector
-        docker-compose exec -T backend python -m pytest tests/test_db.py -v
+        docker-compose exec -T backend1 python -m pytest tests/test_db.py -v
     
     - name: Cleanup
       env:
@@ -497,28 +497,7 @@ jobs:
         echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
         echo "✅ Docker Hub login successful"
 
-    - name: Verify Docker daemon is running
-      run: |
-        echo "🔧 Verifying Docker daemon is running..."
-        if docker info >/dev/null 2>&1; then
-          echo "✅ Docker daemon is running"
-          docker info | grep "Docker Root Dir"
-        else
-          echo "❌ Docker daemon is not running"
-          echo "🔄 Attempting to start Docker daemon..."
-          sudo systemctl start docker
-          sleep 5
 
-          # Check again
-          if docker info >/dev/null 2>&1; then
-            echo "✅ Docker daemon started successfully"
-            docker info | grep "Docker Root Dir"
-          else
-            echo "❌ Failed to start Docker daemon"
-            sudo systemctl status docker
-            exit 1
-          fi
-        fi
 
     - name: Pre-pull MySQL image (largest/heaviest)
       run: |
@@ -555,7 +534,7 @@ jobs:
         echo "📝 Creating docker-compose.prod.yml..."
         cat > docker-compose.prod.yml << EOF
         version: '3.8'
-        
+
         services:
           mysql:
             image: mysql:8.0.35
@@ -574,10 +553,38 @@ jobs:
               timeout: 10s
               retries: 5
               start_period: 60s
-        
-          backend:
+
+          backend1:
             image: ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
-            container_name: phishing-backend
+            container_name: phishing-backend1
+            environment:
+              - FLASK_ENV=production
+              - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
+              - GEMINI_API_KEY=${GEMINI_API_KEY}
+              - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
+              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+            depends_on:
+              mysql:
+                condition: service_healthy
+            restart: unless-stopped
+
+          backend2:
+            image: ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
+            container_name: phishing-backend2
+            environment:
+              - FLASK_ENV=production
+              - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
+              - GEMINI_API_KEY=${GEMINI_API_KEY}
+              - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
+              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+            depends_on:
+              mysql:
+                condition: service_healthy
+            restart: unless-stopped
+
+          backend3:
+            image: ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
+            container_name: phishing-backend3
             environment:
               - FLASK_ENV=production
               - DATABASE_URL=mysql+pymysql://phishing_user:${MYSQL_PASSWORD}@mysql:3306/phishing_db
@@ -593,7 +600,7 @@ jobs:
             image: ${DOCKERHUB_USERNAME}/phishing-detector-frontend:latest
             container_name: phishing-frontend
             depends_on:
-              backend:
+              backend1:
                 condition: service_started
             restart: unless-stopped
 
@@ -606,11 +613,13 @@ jobs:
               - ./nginx.conf:/etc/nginx/nginx.conf:ro
             depends_on:
               - frontend
-              - backend
+              - backend1
+              - backend2
+              - backend3
             restart: unless-stopped
-        
 
-        
+
+
         volumes:
           mysql_data:
         EOF
