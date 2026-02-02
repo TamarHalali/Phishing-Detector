@@ -278,17 +278,25 @@ jobs:
         COMMIT_COUNT=$(git rev-list --count HEAD)
         echo "Total commits: $COMMIT_COUNT"
         
+        # Get current timestamp for unique versioning
+        TIMESTAMP=$(date +%Y%m%d%H%M)
+        
         # Generate version in format X.X.X (major.minor.patch)
-        # Using commit count to ensure unique version
-        # This will create versions like: 1.0.1, 1.0.2, 1.0.3, etc.
+        # Using timestamp + commit count to ensure proper ordering
         MAJOR=1
         MINOR=0
+        # Use a combination that ensures newer versions have higher numbers
         PATCH=$COMMIT_COUNT
         
         NEW_VERSION="$MAJOR.$MINOR.$PATCH"
         echo "Generated version: $NEW_VERSION"
         
+        # Also create a timestamp-based tag for Docker Hub retention
+        TIMESTAMP_VERSION="$MAJOR.$MINOR.$COMMIT_COUNT-$TIMESTAMP"
+        echo "Timestamp version: $TIMESTAMP_VERSION"
+        
         echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo "timestamp_version=$TIMESTAMP_VERSION" >> $GITHUB_OUTPUT
     
     - name: Login to Docker Hub
       run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
@@ -297,6 +305,8 @@ jobs:
       id: backend_build
       run: |
         cd phishing_detector/backend
+        
+        # Build with both version tag and latest
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:${{ steps.version.outputs.version }} .
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest .
 
@@ -305,14 +315,23 @@ jobs:
         trivy image --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest || true
 
         echo "✅ Backend image security scan completed - pushing to Docker Hub"
+        
+        # Push both version and latest tags
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:${{ steps.version.outputs.version }}
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest
+        
+        echo "📋 Current backend image tags:"
+        echo "- ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:${{ steps.version.outputs.version }}"
+        echo "- ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:latest"
+        
         echo "success=true" >> $GITHUB_OUTPUT
 
     - name: Build and Push Frontend Image
       id: frontend_build
       run: |
         cd phishing_detector/frontend
+        
+        # Build with both version tag and latest
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }} .
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest .
 
@@ -321,14 +340,23 @@ jobs:
         trivy image --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest || true
 
         echo "✅ Frontend image security scan completed - pushing to Docker Hub"
+        
+        # Push both version and latest tags
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }}
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest
+        
+        echo "📋 Current frontend image tags:"
+        echo "- ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }}"
+        echo "- ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:latest"
+        
         echo "success=true" >> $GITHUB_OUTPUT
 
     - name: Build and Push Nginx Image
       id: nginx_build
       run: |
         cd phishing_detector
+        
+        # Build with both version tag and latest
         docker build -f nginx.Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:${{ steps.version.outputs.version }} .
         docker build -f nginx.Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest .
 
@@ -337,14 +365,36 @@ jobs:
         trivy image --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest || true
 
         echo "✅ Nginx image security scan completed - pushing to Docker Hub"
+        
+        # Push both version and latest tags
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:${{ steps.version.outputs.version }}
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest
+        
+        echo "📋 Current nginx image tags:"
+        echo "- ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:${{ steps.version.outputs.version }}"
+        echo "- ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:latest"
+        
         echo "success=true" >> $GITHUB_OUTPUT
 
 
 
 
     
+    - name: Display Version Information
+      run: |
+        echo "📋 Version Information Summary:"
+        echo "Current version: ${{ steps.version.outputs.version }}"
+        echo "Commit count: $(git rev-list --count HEAD)"
+        echo "Latest commit: $(git rev-parse --short HEAD)"
+        echo ""
+        echo "🐳 Docker Images Created:"
+        echo "Backend: ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:${{ steps.version.outputs.version }}"
+        echo "Frontend: ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }}"
+        echo "Nginx: ${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:${{ steps.version.outputs.version }}"
+        echo ""
+        echo "💡 Note: Docker Hub retention policy may limit visible versions"
+        echo "💡 Each push creates a new version with incrementing patch number"
+
     - name: Generate Security Report (including built images)
       run: |
         echo "📝 Generating comprehensive security report with built images..."

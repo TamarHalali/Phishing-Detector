@@ -1,0 +1,179 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  dependency-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install Trivy
+      run: |
+        sudo apt-get update
+        sudo apt-get install wget apt-transport-https gnupg lsb-release
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+        echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update
+        sudo apt-get install trivy
+    
+    - name: Run Security Scans
+      run: |
+        chmod +x .github/scripts/security_scanner.py
+        python3 .github/scripts/security_scanner.py dependencies
+        python3 .github/scripts/security_scanner.py docker-base
+    
+    - name: Generate Security Report
+      run: |
+        chmod +x .github/scripts/generate_security_report.py
+        python3 .github/scripts/generate_security_report.py || true
+    
+    - name: Upload scan results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: dependency-scan-results
+        path: |
+          phishing_detector/backend/pip-audit-results.json
+          phishing_detector/backend/safety-results.json
+          phishing_detector/frontend/npm-audit-results.json
+          python-base-scan.json
+          node-base-scan.json
+          mysql-base-scan.json
+          SECURITY_SCAN_REPORT.md
+          security-scan-summary.json
+
+  test:
+    needs: dependency-scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install Docker Compose
+      run: |
+        sudo curl -L "https://github.com/docker/compose/releases/download/v2.21.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+    
+    - name: Start Docker Compose
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
+        MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+        MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+      run: |
+        cd phishing_detector
+        docker-compose -f docker-compose.yml up -d --build
+    
+    - name: Wait for Database
+      run: |
+        cd phishing_detector
+        timeout 120 bash -c 'until docker-compose exec -T mysql mysqladmin ping -h localhost --silent; do sleep 2; done'
+    
+    - name: Run Tests
+      run: |
+        cd phishing_detector
+        docker-compose exec -T backend1 python -m pytest tests/test_db.py -v
+    
+    - name: Cleanup
+      run: |
+        cd phishing_detector
+        docker-compose down
+
+  build-and-push:
+    needs: [dependency-scan, test]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Install Trivy
+      run: |
+        sudo apt-get update
+        sudo apt-get install wget apt-transport-https gnupg lsb-release
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+        echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update
+        sudo apt-get install trivy
+        
+    - name: Calculate Version
+      id: version
+      run: |
+        chmod +x .github/scripts/calculate_version.py
+        python3 .github/scripts/calculate_version.py
+    
+    - name: Login to Docker Hub
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+    
+    - name: Build and Push Docker Images
+      run: |
+        chmod +x .github/scripts/docker_builder.py
+        python3 .github/scripts/docker_builder.py ${{ secrets.DOCKERHUB_USERNAME }} ${{ steps.version.outputs.version }}
+    
+    - name: Generate Security Report (Built Images)
+      run: |
+        chmod +x .github/scripts/generate_security_report.py
+        python3 .github/scripts/generate_security_report.py || true
+    
+    - name: Upload built images scan results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: built-images-scan-results
+        path: |
+          backend-built-scan.json
+          frontend-built-scan.json
+          nginx-built-scan.json
+          SECURITY_SCAN_REPORT.md
+          security-scan-summary.json
+    
+    - name: Create GitHub Release
+      run: |
+        curl -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          https://api.github.com/repos/${{ github.repository }}/releases \
+          -d '{
+            "tag_name": "v${{ steps.version.outputs.version }}",
+            "name": "Release v${{ steps.version.outputs.version }}",
+            "body": "🚀 **Phishing Detector v${{ steps.version.outputs.version }}**\n\n**Docker Images:**\n- `${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:${{ steps.version.outputs.version }}`\n- `${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }}`\n- `${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:${{ steps.version.outputs.version }}`\n\n**Changes:**\n- Commit: ${{ steps.version.outputs.latest_commit }}\n- Tests passed ✅\n- Images published to Docker Hub 🐳",
+            "draft": false,
+            "prerelease": false
+          }' || echo "Release might already exist, continuing..."
+
+  deploy-to-ec2:
+    needs: [build-and-push]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to EC2
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
+        MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+        MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+      run: |
+        chmod +x .github/scripts/ec2_deployer.py
+        python3 .github/scripts/ec2_deployer.py "${{ secrets.EC2_HOST }}" "${{ secrets.SSH_PRIVATE_KEY }}" "${{ secrets.DOCKERHUB_USERNAME }}"
