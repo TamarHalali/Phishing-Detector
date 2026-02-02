@@ -280,6 +280,7 @@ jobs:
         
         # Generate version in format X.X.X (major.minor.patch)
         # Using commit count to ensure unique version
+        # This will create versions like: 1.0.1, 1.0.2, 1.0.3, etc.
         MAJOR=1
         MINOR=0
         PATCH=$COMMIT_COUNT
