@@ -24,12 +24,8 @@ jobs:
     
     - name: Install Trivy
       run: |
-        sudo apt-get update
-        sudo apt-get install wget apt-transport-https gnupg lsb-release
-        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-        echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
-        sudo apt-get update
-        sudo apt-get install trivy
+        chmod +x .github/scripts/install_trivy.sh
+        .github/scripts/install_trivy.sh
     
     - name: Run Security Scans
       run: |
@@ -106,52 +102,20 @@ jobs:
         
     - name: Install Trivy
       run: |
-        sudo apt-get update
-        sudo apt-get install wget apt-transport-https gnupg lsb-release
-        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-        echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
-        sudo apt-get update
-        sudo apt-get install trivy
+        chmod +x .github/scripts/install_trivy.sh
+        .github/scripts/install_trivy.sh
         
     - name: Calculate Version
       id: version
       run: |
-        echo "=== DEBUG VERSION CALCULATION ==="
-        COMMIT_COUNT=$(git rev-list --count HEAD)
-        echo "Raw commit count: $COMMIT_COUNT"
-        
-        LATEST_COMMIT=$(git rev-parse --short HEAD)
-        echo "Latest commit: $LATEST_COMMIT"
-        
-        # Generate version
-        MAJOR=1
-        MINOR=0
-        PATCH=$COMMIT_COUNT
-        VERSION="$MAJOR.$MINOR.$PATCH"
-        
-        echo "Generated version: $VERSION"
-        echo "================================"
-        
-        # Set outputs
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
-        echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
-        echo "latest_commit=$LATEST_COMMIT" >> $GITHUB_OUTPUT
-        
-        # Also run the Python script for comparison
-        chmod +x .github/scripts/calculate_version.py || true
-        python3 .github/scripts/calculate_version.py || echo "Python script failed"
+        chmod +x .github/scripts/calculate_version.py
+        python3 .github/scripts/calculate_version.py
     
     - name: Login to Docker Hub
       run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
     
     - name: Build and Push Docker Images
       run: |
-        echo "=== DOCKER BUILD DEBUG ==="
-        echo "Username: ${{ secrets.DOCKERHUB_USERNAME }}"
-        echo "Version: ${{ steps.version.outputs.version }}"
-        echo "Commit count: ${{ steps.version.outputs.commit_count }}"
-        echo "============================="
-        
         chmod +x .github/scripts/docker_builder.py
         python3 .github/scripts/docker_builder.py ${{ secrets.DOCKERHUB_USERNAME }} ${{ steps.version.outputs.version }}
     
@@ -182,7 +146,7 @@ jobs:
           -d '{
             "tag_name": "v${{ steps.version.outputs.version }}",
             "name": "Release v${{ steps.version.outputs.version }}",
-            "body": "🚀 **Phishing Detector v${{ steps.version.outputs.version }}**\n\n**Docker Images:**\n- `${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:${{ steps.version.outputs.version }}`\n- `${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }}`\n- `${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:${{ steps.version.outputs.version }}`\n\n**Changes:**\n- Commit: ${{ steps.version.outputs.latest_commit }}\n- Tests passed ✅\n- Images published to Docker Hub 🐳",
+            "body": "🚀 **Phishing Detector v${{ steps.version.outputs.version }}**\n\n**Docker Images:**\n- `${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-backend:${{ steps.version.outputs.version }}`\n- `${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-frontend:${{ steps.version.outputs.version }}`\n- `${{ secrets.DOCKERHUB_USERNAME }}/phishing-detector-nginx:${{ steps.version.outputs.version }}`\n\n**Changes:**\n- Commit: ${{ steps.version.outputs.latest_commit }}\n- Tests passed ✅\n- Images published to Docker Hub 🐳\n- Auto-deployed to EC2 🚀",
             "draft": false,
             "prerelease": false
           }' || echo "Release might already exist, continuing..."
@@ -196,12 +160,54 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    - name: Setup SSH
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        EC2_HOST: ${{ secrets.EC2_HOST }}
+      run: |
+        chmod +x .github/scripts/setup_ssh.sh
+        .github/scripts/setup_ssh.sh
+    
     - name: Deploy to EC2
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
         MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
         MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+        EC2_HOST: ${{ secrets.EC2_HOST }}
+        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       run: |
-        chmod +x .github/scripts/ec2_deployer.py
-        python3 .github/scripts/ec2_deployer.py "${{ secrets.EC2_HOST }}" "${{ secrets.SSH_PRIVATE_KEY }}" "${{ secrets.DOCKERHUB_USERNAME }}"
+        echo "🚀 Deploying to EC2..."
+        
+        # Copy deployment script to EC2
+        scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no .github/scripts/deploy_to_ec2.sh ubuntu@$EC2_HOST:~/
+        
+        # Execute deployment script on EC2
+        ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ubuntu@$EC2_HOST \
+          "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
+           MYSQL_PASSWORD=$MYSQL_PASSWORD \
+           GEMINI_API_KEY=$GEMINI_API_KEY \
+           VIRUSTOTAL_API_KEY=$VIRUSTOTAL_API_KEY \
+           DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME \
+           bash ~/deploy_to_ec2.sh"
+        
+        echo "✅ Deployment to EC2 completed successfully!"
+    
+    - name: Verify Deployment
+      env:
+        EC2_HOST: ${{ secrets.EC2_HOST }}
+      run: |
+        echo "🔍 Verifying deployment..."
+        sleep 10
+        
+        if curl -f -s --max-time 10 http://$EC2_HOST/ > /dev/null; then
+          echo "✅ Frontend is responding!"
+        else
+          echo "⚠️ Frontend check failed"
+        fi
+        
+        if curl -f -s --max-time 10 http://$EC2_HOST/api/health > /dev/null; then
+          echo "✅ API is responding!"
+        else
+          echo "⚠️ API check failed"
+        fi
