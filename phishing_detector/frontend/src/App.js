@@ -32,7 +32,10 @@ function App() {
   return (
     <div className="App">
       <header>
-        <h1>Phishing Email Detector</h1>
+        <div className="header-content">
+          <img src="/logo.png" alt="Logo" className="logo" />
+          <h1>Phishing Email Detector</h1>
+        </div>
         {containerInfo && (
           <div className="container-info">
             <small>Container: {containerInfo.container_id} | Host: {containerInfo.hostname} | Requests: {containerInfo.requests_handled}</small>
