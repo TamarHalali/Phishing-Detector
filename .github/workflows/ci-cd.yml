@@ -165,8 +165,12 @@ jobs:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         EC2_HOST: ${{ secrets.EC2_HOST }}
       run: |
-        chmod +x .github/scripts/setup_ssh.sh
-        .github/scripts/setup_ssh.sh
+        echo "🔑 Setting up SSH..."
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+        chmod 600 ~/.ssh/deploy_key
+        ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts 2>/dev/null
+        echo "✅ SSH setup completed"
     
     - name: Deploy to EC2
       env:
