@@ -133,6 +133,7 @@ jobs:
           backend-built-scan.json
           frontend-built-scan.json
           nginx-built-scan.json
+          BUILD_SUMMARY_REPORT.md
           SECURITY_SCAN_REPORT.md
           security-scan-summary.json
     

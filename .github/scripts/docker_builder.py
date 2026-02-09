@@ -82,11 +82,53 @@ class DockerBuilder:
             f"trivy image --severity HIGH,CRITICAL --format json --output {scan_file} {latest_tag} || true"
         )
         
-        # Text output for immediate feedback
-        self.run_command(
-            f"trivy image --severity HIGH,CRITICAL {latest_tag} || true"
+        # Human-readable summary
+        print(f"\n{'='*60}")
+        print(f"📊 SECURITY SCAN SUMMARY - {service_name.upper()}")
+        print(f"{'='*60}")
+        
+        # Run trivy in table format for human-readable output
+        result = subprocess.run(
+            f"trivy image --severity HIGH,CRITICAL --format table {latest_tag}",
+            shell=True, capture_output=True, text=True
         )
         
+        if result.stdout:
+            print(result.stdout)
+        
+        # Parse JSON for summary statistics
+        try:
+            import json
+            with open(scan_file, 'r') as f:
+                scan_data = json.load(f)
+            
+            total_high = 0
+            total_critical = 0
+            
+            for result in scan_data.get('Results', []):
+                for vuln in result.get('Vulnerabilities', []):
+                    severity = vuln.get('Severity', '')
+                    if severity == 'HIGH':
+                        total_high += 1
+                    elif severity == 'CRITICAL':
+                        total_critical += 1
+            
+            print(f"\n📈 Vulnerability Count:")
+            print(f"   🔴 Critical: {total_critical}")
+            print(f"   🟠 High: {total_high}")
+            print(f"   📊 Total: {total_critical + total_high}")
+            
+            if total_critical > 0:
+                print(f"\n⚠️  WARNING: {total_critical} CRITICAL vulnerabilities found!")
+            elif total_high > 0:
+                print(f"\n⚠️  {total_high} HIGH severity vulnerabilities found")
+            else:
+                print(f"\n✅ No HIGH or CRITICAL vulnerabilities found!")
+                
+        except Exception as e:
+            print(f"⚠️  Could not parse scan results: {e}")
+        
+        print(f"{'='*60}\n")
         print(f"✅ {service_name} image security scan completed")
     
     def push_image(self, service_name):
@@ -143,14 +185,27 @@ class DockerBuilder:
         print(f"Version: {self.version}")
         
         results = {}
+        scan_results = {}
         
         for service in ['backend', 'frontend', 'nginx']:
             results[service] = self.build_scan_push(service)
+            
+            # Collect scan results
+            scan_file = f"{service}-built-scan.json"
+            try:
+                import json
+                with open(scan_file, 'r') as f:
+                    scan_results[service] = json.load(f)
+            except:
+                scan_results[service] = None
+        
+        # Generate summary report
+        self.generate_summary_report(results, scan_results)
         
         # Summary
-        print(f"\n{'='*50}")
-        print("BUILD SUMMARY")
-        print(f"{'='*50}")
+        print(f"\n{'='*60}")
+        print("🎯 FINAL BUILD SUMMARY")
+        print(f"{'='*60}")
         
         all_success = True
         for service, success in results.items():
@@ -159,13 +214,102 @@ class DockerBuilder:
             if not success:
                 all_success = False
         
+        print(f"{'='*60}")
+        
         if all_success:
-            print("\n🎉 All images built and pushed successfully!")
+            print("🎉 All images built, scanned, and pushed successfully!")
+            print("🐳 Images are now available on Docker Hub:")
+            print(f"   - {self.username}/phishing-detector-backend:{self.version}")
+            print(f"   - {self.username}/phishing-detector-frontend:{self.version}")
+            print(f"   - {self.username}/phishing-detector-nginx:{self.version}")
+            print("\n📄 Summary report: BUILD_SUMMARY_REPORT.md")
         else:
-            print("\n⚠️ Some images failed to build/push")
+            print("⚠️ Some images failed to build/push")
             sys.exit(1)
         
         return all_success
+    
+    def generate_summary_report(self, results, scan_results):
+        """Generate a markdown summary report"""
+        import json
+        from datetime import datetime
+        
+        report = []
+        report.append("# Docker Build & Security Scan Summary\n")
+        report.append(f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        report.append(f"**Version:** {self.version}\n")
+        report.append(f"**Username:** {self.username}\n\n")
+        
+        report.append("## Build Status\n\n")
+        report.append("| Service | Status | Image |\n")
+        report.append("|---------|--------|-------|\n")
+        
+        for service, success in results.items():
+            status = "✅ Success" if success else "❌ Failed"
+            image = f"{self.username}/phishing-detector-{service}:{self.version}"
+            report.append(f"| {service.capitalize()} | {status} | `{image}` |\n")
+        
+        report.append("\n## Security Scan Results\n\n")
+        
+        total_critical = 0
+        total_high = 0
+        
+        for service, scan_data in scan_results.items():
+            if not scan_data:
+                continue
+            
+            service_critical = 0
+            service_high = 0
+            
+            for result in scan_data.get('Results', []):
+                for vuln in result.get('Vulnerabilities', []):
+                    severity = vuln.get('Severity', '')
+                    if severity == 'HIGH':
+                        service_high += 1
+                        total_high += 1
+                    elif severity == 'CRITICAL':
+                        service_critical += 1
+                        total_critical += 1
+            
+            report.append(f"### {service.capitalize()}\n\n")
+            report.append(f"- 🔴 **Critical:** {service_critical}\n")
+            report.append(f"- 🟠 **High:** {service_high}\n")
+            report.append(f"- 📊 **Total:** {service_critical + service_high}\n\n")
+            
+            if service_critical > 0:
+                report.append(f"⚠️ **WARNING:** {service_critical} CRITICAL vulnerabilities found!\n\n")
+            elif service_high > 0:
+                report.append(f"⚠️ {service_high} HIGH severity vulnerabilities found\n\n")
+            else:
+                report.append("✅ No HIGH or CRITICAL vulnerabilities found\n\n")
+        
+        report.append("## Overall Summary\n\n")
+        report.append(f"- 🔴 **Total Critical:** {total_critical}\n")
+        report.append(f"- 🟠 **Total High:** {total_high}\n")
+        report.append(f"- 📊 **Total Vulnerabilities:** {total_critical + total_high}\n\n")
+        
+        if total_critical > 0:
+            report.append(f"### ⚠️ Action Required\n\n")
+            report.append(f"{total_critical} CRITICAL vulnerabilities detected across all images. ")
+            report.append("Please review and update dependencies.\n\n")
+        elif total_high > 0:
+            report.append(f"### ℹ️ Recommendation\n\n")
+            report.append(f"{total_high} HIGH severity vulnerabilities detected. ")
+            report.append("Consider updating affected packages.\n\n")
+        else:
+            report.append("### ✅ All Clear\n\n")
+            report.append("No HIGH or CRITICAL vulnerabilities detected in any images.\n\n")
+        
+        report.append("## Docker Hub Links\n\n")
+        report.append(f"- [Backend Image](https://hub.docker.com/r/{self.username}/phishing-detector-backend)\n")
+        report.append(f"- [Frontend Image](https://hub.docker.com/r/{self.username}/phishing-detector-frontend)\n")
+        report.append(f"- [Nginx Image](https://hub.docker.com/r/{self.username}/phishing-detector-nginx)\n")
+        
+        # Write report
+        with open('BUILD_SUMMARY_REPORT.md', 'w') as f:
+            f.writelines(report)
+        
+        print("\n📄 Summary report generated: BUILD_SUMMARY_REPORT.md")
 
 def main():
     if len(sys.argv) < 3:
