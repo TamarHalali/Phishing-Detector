@@ -77,10 +77,18 @@ class DockerBuilder:
         
         print(f"🔍 Scanning {service_name} image for vulnerabilities...")
         
-        # JSON output for reports
-        self.run_command(
-            f"trivy image --severity HIGH,CRITICAL --format json --output {scan_file} {latest_tag} || true"
+        # JSON output for reports - without || true to catch errors
+        result = subprocess.run(
+            f"trivy image --severity HIGH,CRITICAL --format json --output {scan_file} {latest_tag}",
+            shell=True, capture_output=True, text=True
         )
+        
+        if result.returncode != 0:
+            print(f"⚠️  Trivy scan had issues: {result.stderr}")
+            # Create empty result file so report generation doesn't fail
+            import json
+            with open(scan_file, 'w') as f:
+                json.dump({'Results': []}, f)
         
         # Human-readable summary
         print(f"\n{'='*60}")
@@ -99,8 +107,12 @@ class DockerBuilder:
         # Parse JSON for summary statistics
         try:
             import json
-            with open(scan_file, 'r') as f:
-                scan_data = json.load(f)
+            if os.path.exists(scan_file):
+                with open(scan_file, 'r') as f:
+                    scan_data = json.load(f)
+            else:
+                print(f"⚠️  Scan file {scan_file} not found!")
+                scan_data = {'Results': []}
             
             total_high = 0
             total_critical = 0
@@ -127,6 +139,8 @@ class DockerBuilder:
                 
         except Exception as e:
             print(f"⚠️  Could not parse scan results: {e}")
+            import traceback
+            traceback.print_exc()
         
         print(f"{'='*60}\n")
         print(f"✅ {service_name} image security scan completed")

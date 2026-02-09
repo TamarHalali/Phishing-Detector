@@ -14,17 +14,18 @@ EOF
 
 echo "🐳 Pulling latest images..."
 cd ~/phishing-detector
-docker pull mysql:8.0.35
-docker pull ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest
-docker pull ${DOCKERHUB_USERNAME}/phishing-detector-frontend:latest
-docker pull ${DOCKERHUB_USERNAME}/phishing-detector-nginx:latest
+docker pull mysql:8.0.35 &
+docker pull ${DOCKERHUB_USERNAME}/phishing-detector-backend:latest &
+docker pull ${DOCKERHUB_USERNAME}/phishing-detector-frontend:latest &
+docker pull ${DOCKERHUB_USERNAME}/phishing-detector-nginx:latest &
+wait
 
 echo "🔄 Restarting services..."
 docker-compose down || true
 docker-compose up -d
 
-echo "⏳ Waiting for services..."
-sleep 30
+echo "⏳ Waiting for services to start..."
+sleep 20
 
 echo "🔍 Checking status..."
 docker-compose ps

@@ -206,14 +206,14 @@ jobs:
         scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no .github/scripts/deploy_to_ec2.sh ubuntu@$EC2_HOST:~/
         scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ec2-docker-compose.yml ubuntu@$EC2_HOST:~/phishing-detector/docker-compose.yml
         
-        # Execute deployment script on EC2
-        ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ubuntu@$EC2_HOST \
-          "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
-           MYSQL_PASSWORD=$MYSQL_PASSWORD \
-           GEMINI_API_KEY=$GEMINI_API_KEY \
-           VIRUSTOTAL_API_KEY=$VIRUSTOTAL_API_KEY \
-           DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME \
-           bash ~/deploy_to_ec2.sh"
+        # Execute deployment script on EC2 with nohup to prevent disconnection
+        ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ServerAliveInterval=60 ubuntu@$EC2_HOST \
+          "MYSQL_ROOT_PASSWORD='$MYSQL_ROOT_PASSWORD' \
+           MYSQL_PASSWORD='$MYSQL_PASSWORD' \
+           GEMINI_API_KEY='$GEMINI_API_KEY' \
+           VIRUSTOTAL_API_KEY='$VIRUSTOTAL_API_KEY' \
+           DOCKERHUB_USERNAME='$DOCKERHUB_USERNAME' \
+           nohup bash ~/deploy_to_ec2.sh > ~/deployment.log 2>&1 && cat ~/deployment.log"
         
         echo "✅ Deployment to EC2 completed successfully!"
     
